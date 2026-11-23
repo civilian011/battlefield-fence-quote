@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Fence Rental Quote Builder</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;500;600;700&family=Oswald:wght@500;600;700&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+<style>
+/* Layout: white page, heavy black rule under the header, form on the left, sticky quote summary on the right.
+   Tokens follow the Battlefield Cat Rentals design system (Rental Red, black, white, true grays). */
+:root {
+  --red: #AF0E0E;
+  --red-hover: #8F0B0B;
+  --red-active: #6E0808;
+  --red-text: #AF0E0E;
+  --red-tint: #F7E7E7;
+  --bg: #F7F7F7;
+  --surface: #FFFFFF;
+  --surface-2: #EDEDED;
+  --ink: #171717;
+  --ink-strong: #000000;
+  --muted: #515151;
+  --subtle: #6E6E6E;
+  --line: #D6D6D6;
+  --line-strong: #B8B8B8;
+  --band: #000000;
+  --band-ink: #FFFFFF;
+  --ok: #2F7D34;
+  --ok-tint: #E7F0E7;
+  --font-display: "Oswald", "Arial Narrow", "Liberation Sans Narrow", Arial, sans-serif;
+  --font-body: "Archivo Narrow", "Arial Narrow", "Liberation Sans Narrow", Arial, sans-serif;
+  --radius-sm: 4px;
+  --radius-lg: 8px;
+  --shadow-focus: 0 0 0 2px var(--surface), 0 0 0 4px var(--red);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --red-text: #FF7A7A; --red-tint: #3A1414;
+    --bg: #0E0E0E; --surface: #181818; --surface-2: #262626;
+    --ink: #EDEDED; --ink-strong: #FFFFFF; --muted: #B8B8B8; --subtle: #969696;
+    --line: #333333; --line-strong: #515151;
+    --band: #000000; --band-ink: #FFFFFF;
+    --ok: #7CC782; --ok-tint: #17301A;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --red-text: #FF7A7A; --red-tint: #3A1414;
+  --bg: #0E0E0E; --surface: #181818; --surface-2: #262626;
+  --ink: #EDEDED; --ink-strong: #FFFFFF; --muted: #B8B8B8; --subtle: #969696;
+  --line: #333333; --line-strong: #515151;
+  --band: #000000; --band-ink: #FFFFFF;
+  --ok: #7CC782; --ok-tint: #17301A;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+h1, h2, h3 { font-family: var(--font-display); color: var(--ink-strong); margin: 0; text-wrap: balance; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: none; box-shadow: var(--shadow-focus); }
+.num, .money { font-variant-numeric: tabular-nums; }
+
+/* Header */
+.top { background: var(--surface); border-bottom: 4px solid var(--band); }
+.top-in { max-width: 1240px; margin: 0 auto; padding-block: 14px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; align-items: center; gap: 16px 24px; flex-wrap: wrap; }
+.logo { height: 48px; width: auto; display: block; flex: none; }
+.app-title { display: flex; flex-direction: column; min-width: 0; flex: 1 1 220px; }
+.app-title .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.app-title h1 { font-size: 26px; line-height: 1.05; text-transform: uppercase; letter-spacing: -.01em; font-weight: 700; }
+.top-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.rep-chip { display: inline-flex; align-items: center; gap: 10px; padding: 6px 12px 6px 6px; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface); cursor: pointer; max-width: 100%; }
+.rep-chip:hover { border-color: var(--ink-strong); }
+.rep-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--red); color: #fff; display: grid; place-items: center; font-family: var(--font-display); font-weight: 600; font-size: 13px; flex: none; }
+.rep-chip .rep-name { font-weight: 600; line-height: 1.1; text-align: left; }
+.rep-chip .rep-sub { font-size: 12px; color: var(--muted); line-height: 1.1; text-align: left; }
+
+/* Buttons (design system: uppercase, condensed, red primary / black secondary) */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 16px; border: 2px solid transparent; border-radius: var(--radius-sm); font-family: var(--font-body); font-weight: 600; font-size: 14px; letter-spacing: .04em; text-transform: uppercase; text-decoration: none; cursor: pointer; white-space: nowrap; background: var(--red); color: #fff; transition: background 120ms cubic-bezier(.2,0,0,1), transform 120ms; }
+.btn:hover { background: var(--red-hover); }
+.btn:active { background: var(--red-active); transform: scale(.98); }
+.btn[disabled] { background: var(--surface-2); color: var(--subtle); cursor: not-allowed; transform: none; }
+.btn-black { background: var(--ink-strong); color: var(--surface); }
+.btn-black:hover { background: var(--muted); }
+.btn-outline { background: transparent; color: var(--ink-strong); border-color: var(--ink-strong); }
+.btn-outline:hover { background: var(--ink-strong); color: var(--surface); }
+.btn-ghost { background: transparent; color: var(--red-text); }
+.btn-ghost:hover { background: var(--red-tint); }
+.btn-sm { height: 32px; padding: 0 12px; font-size: 12px; }
+.btn-block { width: 100%; }
+.btn svg { width: 16px; height: 16px; flex: none; }
+
+/* Page */
+.wrap { max-width: 1240px; margin: 0 auto; padding-block: 24px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 24px; align-items: start; }
+@media (max-width: 980px) { .wrap { grid-template-columns: minmax(0, 1fr); } }
+.form { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+
+.banner { display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 14px 16px; background: var(--surface); border: 2px solid var(--ink-strong); border-radius: var(--radius-lg); }
+.banner p { margin: 0; min-width: 0; flex: 1 1 260px; }
+.banner strong { font-family: var(--font-display); text-transform: uppercase; font-weight: 600; letter-spacing: .01em; }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; }
+.card-h { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+.card-h h2 { font-size: 20px; text-transform: uppercase; font-weight: 600; letter-spacing: 0; }
+.card-h h2 .part { color: var(--red-text); margin-right: 6px; }
+.card-h .sub { font-size: 13px; color: var(--muted); }
+.card-h .subtotal { font-family: var(--font-display); font-weight: 600; font-size: 18px; color: var(--ink-strong); }
+.card-b { padding: 18px; display: flex; flex-direction: column; gap: 16px; }
+.note { font-size: 13px; color: var(--muted); margin: 0; }
+.note b { color: var(--ink); }
+
+.grid { display: grid; gap: 14px 16px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.grid-3 { display: grid; gap: 14px 16px; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.field label, .lbl { font-weight: 600; font-size: 11px; letter-spacing: .13em; text-transform: uppercase; color: var(--ink-strong); }
+.field .hint { font-size: 12px; color: var(--muted); line-height: 1.35; }
+.field .hint.warn { color: var(--red-text); }
+.inp { height: 40px; padding: 0 12px; background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius-sm); width: 100%; min-width: 0; font-size: 15px; transition: border-color 120ms, box-shadow 120ms; }
+.inp:hover { border-color: var(--muted); }
+.inp:focus { outline: none; border-color: var(--ink-strong); box-shadow: var(--shadow-focus); }
+textarea.inp { height: auto; min-height: 76px; padding: 10px 12px; resize: vertical; }
+select.inp { padding-right: 32px; }
+
+/* Line items: rate × quantity = amount */
+.lines { display: flex; flex-direction: column; }
+.line { display: grid; grid-template-columns: minmax(0, 1fr) 128px 112px; gap: 8px 16px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); }
+.line:first-child { border-top: 0; padding-top: 0; }
+.line .what { min-width: 0; }
+.line .what .name { font-weight: 600; color: var(--ink-strong); }
+.line .what .rate { font-size: 13px; color: var(--muted); }
+.line .qty { display: flex; align-items: center; gap: 6px; }
+.line .qty .inp { text-align: right; }
+.line .qty .unit { font-size: 12px; color: var(--muted); white-space: nowrap; }
+.line .amt { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink-strong); }
+.line .amt.zero { color: var(--subtle); font-weight: 400; }
+.line .calc { grid-column: 1 / -1; font-size: 12px; color: var(--muted); margin-top: -4px; }
+@media (max-width: 520px) {
+  .line { grid-template-columns: minmax(0, 1fr) 112px; }
+  .line .what { grid-column: 1 / -1; }
+}
+.subhead { font-family: var(--font-display); font-weight: 600; text-transform: uppercase; font-size: 15px; color: var(--ink-strong); margin: 4px 0 -4px; letter-spacing: .01em; }
+
+.seg { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+.opt { position: relative; display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border: 1px solid var(--line-strong); border-radius: var(--radius-sm); cursor: pointer; background: var(--surface); }
+.opt:hover { border-color: var(--ink-strong); }
+.opt input { accent-color: var(--red); margin: 3px 0 0; width: 16px; height: 16px; flex: none; }
+.opt .t { font-weight: 600; color: var(--ink-strong); line-height: 1.25; }
+.opt .d { font-size: 13px; color: var(--muted); }
+.opt:has(input:checked) { border: 2px solid var(--red); padding: 11px 13px; }
+.check { display: inline-flex; gap: 8px; align-items: center; font-size: 13px; color: var(--muted); cursor: pointer; }
+.check input { accent-color: var(--red); width: 15px; height: 15px; margin: 0; }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; letter-spacing: .02em; }
+.pill-red { background: var(--red-tint); color: var(--red-text); }
+.pill-ok { background: var(--ok-tint); color: var(--ok); }
+
+/* Summary */
+.summary { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+@media (max-width: 980px) { .summary { position: static; } }
+.sum-card { background: var(--surface); border: 2px solid var(--ink-strong); border-radius: var(--radius-lg); overflow: hidden; }
+.sum-head { background: var(--band); color: var(--band-ink); padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.sum-head .lbl { color: #B8B8B8; }
+.sum-head .qno { font-family: var(--font-display); font-weight: 600; font-size: 17px; letter-spacing: .02em; color: #fff; }
+.sum-head .state { font-size: 12px; color: #B8B8B8; text-align: right; }
+.sum-body { padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+.sum-row { display: flex; justify-content: space-between; gap: 12px; }
+.sum-row span:first-child { color: var(--muted); }
+.sum-row span:last-child { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--ink-strong); }
+.sum-total { background: var(--red); color: #fff; padding: 14px 18px; display: flex; flex-direction: column; gap: 2px; }
+.sum-total .lbl { color: #fff; opacity: .9; }
+.sum-total .big { font-family: var(--font-display); font-weight: 700; font-size: 40px; line-height: 1; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+.sum-total .tax { font-size: 12px; opacity: .9; }
+.sum-facts { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--line); }
+.sum-facts div { padding: 12px 18px; display: flex; flex-direction: column; }
+.sum-facts div + div { border-left: 1px solid var(--line); }
+.sum-facts b { font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--ink-strong); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.sum-facts small { font-size: 12px; color: var(--muted); }
+.sum-actions { padding: 16px 18px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; }
+.sum-actions .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.warnings { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.warnings li { font-size: 13px; color: var(--red-text); display: flex; gap: 6px; }
+.warnings li::before { content: ""; width: 6px; height: 6px; background: currentColor; border-radius: 50%; margin-top: 7px; flex: none; }
+.status { font-size: 13px; color: var(--muted); min-height: 1.4em; margin: 0; }
+.email-box { display: flex; flex-direction: column; gap: 8px; padding: 14px 18px; border-top: 1px solid var(--line); background: var(--bg); }
+.email-box .to { font-size: 13px; word-break: break-all; }
+.email-box .row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* Dialogs */
+dialog { border: 0; padding: 0; border-radius: var(--radius-lg); background: var(--surface); color: var(--ink); width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 48px); box-shadow: 0 18px 48px rgba(0,0,0,.24); }
+dialog::backdrop { background: rgba(0,0,0,.55); }
+.dlg-h { padding: 16px 20px; border-bottom: 4px solid var(--band); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.dlg-h h2 { font-size: 22px; text-transform: uppercase; font-weight: 600; }
+.dlg-b { padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; overflow: auto; }
+.dlg-f { padding: 14px 20px; border-top: 1px solid var(--line); display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
+.x { background: transparent; border: 0; width: 36px; height: 36px; border-radius: var(--radius-sm); cursor: pointer; display: grid; place-items: center; color: var(--ink-strong); }
+.x:hover { background: var(--surface-2); }
+.x svg { width: 18px; height: 18px; }
+#savedDlg { width: min(760px, calc(100vw - 32px)); }
+#previewDlg { width: min(900px, calc(100vw - 32px)); }
+#previewDlg .dlg-b { background: #8a8a8a; padding: 20px; }
+.preview-scroll { overflow-x: auto; }
+.preview-scroll .qd { margin: 0 auto; box-shadow: 0 4px 10px rgba(0,0,0,.2); }
+.saved-list { display: flex; flex-direction: column; }
+.saved-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 16px; padding: 12px 0; border-top: 1px solid var(--line); align-items: center; }
+.saved-item:first-child { border-top: 0; }
+.saved-item .who { min-width: 0; }
+.saved-item .who b { color: var(--ink-strong); font-weight: 600; }
+.saved-item .who .meta { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+.saved-item .acts { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.saved-item .tot { font-family: var(--font-display); font-weight: 600; color: var(--ink-strong); font-variant-numeric: tabular-nums; }
+.empty { padding: 28px 8px; text-align: center; color: var(--muted); }
+.empty b { display: block; font-family: var(--font-display); text-transform: uppercase; color: var(--ink-strong); font-weight: 600; font-size: 17px; }
+
+.toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); transform: translateX(-50%); background: var(--band); color: var(--band-ink); padding: 10px 16px; border-radius: var(--radius-sm); font-weight: 600; box-shadow: 0 10px 24px rgba(0,0,0,.25); z-index: 50; max-width: calc(100vw - 32px); }
+.offscreen { position: absolute; left: -10000px; top: 0; }
+
+/* ===== Quote document (paper — always light) ===== */
+.qd { width: 728px; background: #FFFFFF; color: #171717; font-family: "Archivo Narrow", "Arial Narrow", Arial, sans-serif; font-size: 12.5px; line-height: 1.4; padding: 0; }
+.qd * { box-sizing: border-box; }
+[hidden] { display: none !important; }
+.qd-sheet { padding: 0; }
+.qd .qd-top { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; padding-bottom: 12px; border-bottom: 4px solid #000; }
+.qd .qd-logo { height: 58px; width: auto; display: block; }
+.qd .qd-title { text-align: right; }
+.qd .qd-title h1 { font-family: "Oswald", "Arial Narrow", Arial, sans-serif; font-size: 23px; line-height: 1.05; font-weight: 700; text-transform: uppercase; color: #000; margin: 0 0 4px; letter-spacing: -.005em; }
+.qd .qd-title div { font-size: 12px; color: #3B3B3B; }
+.qd .qd-title b { color: #000; }
+.qd .qd-parties { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 14px 0; }
+.qd .qd-k { font-size: 9.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #AF0E0E; margin-bottom: 4px; }
+.qd .qd-party div { line-height: 1.45; }
+.qd .qd-party .nm { font-weight: 700; color: #000; font-size: 13.5px; }
+.qd .qd-facts { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid #000; margin-bottom: 14px; }
+.qd .qd-facts div { padding: 7px 10px; }
+.qd .qd-facts div + div { border-left: 1px solid #D6D6D6; }
+.qd .qd-facts b { display: block; color: #000; font-size: 13px; }
+.qd table { width: 100%; border-collapse: collapse; }
+.qd th { text-align: left; font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; color: #515151; font-weight: 700; padding: 6px 8px; border-bottom: 1px solid #000; }
+.qd th.r, .qd td.r { text-align: right; }
+.qd td { padding: 4px 8px; border-bottom: 1px solid #E3E3E3; vertical-align: top; font-variant-numeric: tabular-nums; }
+.qd tr.part td { background: #000; color: #fff; font-family: "Oswald", "Arial Narrow", Arial, sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: .02em; font-size: 12px; padding: 6px 8px; border-bottom: 0; }
+.qd tr.part-note td { font-size: 11px; color: #515151; border-bottom: 1px solid #E3E3E3; font-style: italic; }
+.qd tr.sub td { font-weight: 700; color: #000; border-bottom: 2px solid #000; }
+.qd tr.none td { color: #6E6E6E; }
+.qd td .d { font-size: 11px; color: #515151; }
+.qd .qd-totals { display: flex; justify-content: space-between; align-items: stretch; gap: 20px; margin-top: 14px; }
+.qd .qd-notes { flex: 1; font-size: 11px; color: #3B3B3B; display: flex; flex-direction: column; gap: 4px; }
+.qd .qd-notes p { margin: 0; }
+.qd .qd-box { width: 300px; border: 2px solid #000; flex: none; }
+.qd .qd-box .r { display: flex; justify-content: space-between; padding: 5px 10px; border-bottom: 1px solid #E3E3E3; font-variant-numeric: tabular-nums; }
+.qd .qd-box .r b { color: #000; }
+.qd .qd-box .grand { background: #AF0E0E; color: #fff; padding: 8px 10px; display: flex; justify-content: space-between; align-items: baseline; }
+.qd .qd-box .grand span:first-child { font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.qd .qd-box .grand span:last-child { font-family: "Oswald", "Arial Narrow", Arial, sans-serif; font-weight: 700; font-size: 22px; font-variant-numeric: tabular-nums; }
+.qd .qd-box .panels { display: flex; justify-content: space-between; padding: 5px 10px; }
+.qd .qd-disc { margin-top: 12px; padding: 8px 10px; border: 1px solid #000; text-align: center; font-weight: 700; font-size: 11px; letter-spacing: .03em; color: #000; }
+.qd .qd-valid { text-align: center; font-size: 12px; margin-top: 6px; }
+.qd .qd-cnotes { margin-top: 12px; border-left: 4px solid #000; padding: 6px 10px; background: #F7F7F7; white-space: pre-wrap; }
+.qd .qd-terms { padding-top: 4px; }
+.qd .qd-terms h2 { font-family: "Oswald", "Arial Narrow", Arial, sans-serif; font-size: 17px; font-weight: 700; text-transform: uppercase; color: #000; margin: 0 0 8px; padding-bottom: 6px; border-bottom: 4px solid #000; }
+.qd .qd-terms ol { margin: 0; padding-left: 18px; font-size: 11px; color: #262626; display: flex; flex-direction: column; gap: 5px; }
+.qd .qd-sign { display: grid; grid-template-columns: 1.3fr 1fr .7fr; gap: 20px; margin-top: 26px; }
+.qd .qd-sign div { border-top: 1px solid #000; padding-top: 4px; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: #515151; height: 46px; display: flex; align-items: flex-end; border-top: 0; border-bottom: 1px solid #000; padding-bottom: 3px; }
+.qd .qd-foot { margin-top: 20px; padding-top: 8px; border-top: 4px solid #AF0E0E; display: flex; justify-content: space-between; gap: 16px; font-size: 11px; color: #3B3B3B; }
+.qd .qd-foot b { color: #000; }
+.qd .pb { page-break-before: always; break-before: page; }
+.qd .avoid { page-break-inside: avoid; break-inside: avoid; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <img class="logo" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIj8+CjxzdmcgaWQ9IkNvbG9yX05PX0tleWxpbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgMjg4IDcyIj4KICAKICA8ZGVmcz4KICAgIAogIDwvZGVmcz4KICA8Zz4KICAgIDxyZWN0IHg9IjE3Ny45NSIgd2lkdGg9IjExMC4wNSIgaGVpZ2h0PSI3MiI+PC9yZWN0PgogICAgPHJlY3QgZmlsbD0iI0FGMEUwRSIgd2lkdGg9IjE3Ny45NSIgaGVpZ2h0PSI3MiI+PC9yZWN0PgogICAgPHBhdGggZmlsbD0iI0ZGRkZGRiIgZD0iTTE5Ny40Myw0NS42M2wtMS4xMS4wM3YtNC42aDEuMjdjLjk2LDAsMS4yOC43MywxLjI4LDIuMzNzLS4zNSwyLjI0LTEuNDQsMi4yNE0yMDMuMDIsNTYuMTJ2LTQuOTNjMC0yLjM0LS44LTMuNy0yLjUyLTQuMDIsMi0uNTUsMi41NC0yLjI5LDIuNTQtNC41MiwwLTMuMTQtMS4wOS01LjA5LTQuNjEtNS4wOWgtNi4zMXYyMC4zM2g0LjIxdi04Ljg0aDEuMDRjMS4wMSwwLDEuNDkuNzIsMS40OSwxLjY5djUuNDFjMCwuOS4xOCwxLjU2LjI5LDEuNzRoNC4yNWMtLjE1LS4xNy0uMzctLjg3LS4zNy0xLjc3Ij48L3BhdGg+CiAgICA8cG9seWdvbiBmaWxsPSIjRkZGRkZGIiBwb2ludHM9IjI1Mi44NiAzNy41NiAyNTIuODYgNTcuOSAyNjEuNjcgNTcuOSAyNjEuNjcgNTQuMDQgMjU3LjE4IDU0LjA0IDI1Ny4xOCAzNy41NiAyNTIuODYgMzcuNTYiPjwvcG9seWdvbj4KICAgIDxwb2x5Z29uIGZpbGw9IiNGRkZGRkYiIHBvaW50cz0iMjA0Ljk5IDM3LjU1IDIwNSAzNy41NSAyMDUgNTcuODkgMjE0LjYyIDU3Ljg5IDIxNC42MiA1My45NyAyMDkuMzEgNTMuOTcgMjA5LjMxIDQ5LjQ1IDIxMy43OCA0OS40NSAyMTMuNzggNDUuNDcgMjA5LjMxIDQ1LjQ3IDIwOS4zMSA0MS40NCAyMTQuNDQgNDEuNDQgMjE0LjQ0IDM3LjU1IDIwNC45OSAzNy41NSI+PC9wb2x5Z29uPgogICAgPHBvbHlnb24gZmlsbD0iI0ZGRkZGRiIgcG9pbnRzPSIyMjAuNCAzNy41NyAyMjQuMTggNDggMjI0LjE4IDM3LjU3IDIyOC4yOCAzNy41NyAyMjguMjggNTcuODkgMjI0LjQ1IDU3Ljg5IDIyMC40IDQ3LjYgMjIwLjQgNTcuODkgMjE2LjIyIDU3Ljg5IDIxNi4yMiAzNy41NyAyMjAuNCAzNy41NyI+PC9wb2x5Z29uPgogICAgPHBhdGggZmlsbD0iI0ZGRkZGRiIgZD0iTTI3My42NCw0My42OGgtNC4xdi0xLjM5YzAtLjY0LS4yNC0xLjM4LTEuMDctMS4zOC0uNjEsMC0xLjI3LjM3LTEuMzUsMS4xLS4xNCwxLjM3Ljc1LDIuMjYsMS42NiwzLjEzLDIuNCwyLjMyLDUuMyw0LjE5LDUuMDgsNy45OS0uMTIsMi4xMy0xLjQxLDQuMDYtMy40MSw0LjgzLTIuMjQuODUtNS42NS4zNy03LjA4LTEuNzItLjk3LTEuNDEtLjkyLTIuOTktLjg4LTQuNjRoNC4wN3YxLjQ5YzAsLjY4LjQzLDEuMzksMS4xNCwxLjQ4LDEuMzYuMTgsMS44My0uNzcsMS42Mi0xLjk4LS4xLS41OC0uMzgtMS4wNC0uNzUtMS40OC0xLjY2LTItNC4xLTMuMzMtNS4zMS01LjctMS42NC0zLjE5LS4wNy03LjMyLDMuNTUtOC4xMSwyLjE4LS40OCw0LjUzLjAzLDUuODYsMS45MS45NSwxLjM1LDEuMDMsMi44Ny45OCw0LjQ3Ij48L3BhdGg+CiAgICA8cG9seWdvbiBmaWxsPSIjRkZGRkZGIiBwb2ludHM9IjIzOS44MyAzNy41NyAyMzkuODMgNDEuNTIgMjM3IDQxLjUyIDIzNyA1Ny44OSAyMzIuNDIgNTcuODkgMjMyLjQyIDQxLjUyIDIyOS41OSA0MS41MiAyMjkuNTkgMzcuNTcgMjM5LjgzIDM3LjU3Ij48L3BvbHlnb24+CiAgICA8cGF0aCBmaWxsPSIjRkZGRkZGIiBkPSJNMjQ1LjM1LDQxLjEzbDEuMDksOS40N2gtMi4xOGwxLjA5LTkuNDdaTTI0Mi41MiwzNy41N2wtMy4zNSwyMC4zMmg0LjI1bC40MS0zLjU5aDMuMDNzLjQxLDMuNTkuNDEsMy41OWg0LjI1bC0zLjM3LTIwLjMyaC01LjY0WiI+PC9wYXRoPgogICAgPHBhdGggZmlsbD0iI0ZGRkZGRiIgZD0iTTI3Ni4wNCwzOS4yOWMtLjU0LDAtLjY0LS4zMi0uNjItLjY4aC40NGMwLC4yLDAsLjM3LjI1LjM3LjE1LDAsLjIyLS4xLjIyLS4yNCwwLS4zOC0uODgtLjQtLjg4LTEuMDIsMC0uMzMuMTYtLjU5LjY5LS41OS40MywwLC42NC4xOS42MS42M2gtLjQzYzAtLjE2LS4wMy0uMzItLjItLjMyLS4xNCwwLS4yMy4wOC0uMjMuMjIsMCwuNC44OC4zNi44OCwxLjAyLDAsLjU0LS40LjYxLS43My42MSI+PC9wYXRoPgogICAgPHBvbHlnb24gZmlsbD0iI0ZGRkZGRiIgcG9pbnRzPSIyNzYuOTYgMzkuMjYgMjc2Ljk2IDM3LjE3IDI3Ny42NiAzNy4xNyAyNzcuOTkgMzguNTkgMjc4IDM4LjU5IDI3OC4zNCAzNy4xNyAyNzkuMDIgMzcuMTcgMjc5LjAyIDM5LjI2IDI3OC42IDM5LjI2IDI3OC42IDM3LjY1IDI3OC41OSAzNy42NSAyNzguMTkgMzkuMjYgMjc3Ljc3IDM5LjI2IDI3Ny4zOSAzNy42NSAyNzcuMzggMzcuNjUgMjc3LjM4IDM5LjI2IDI3Ni45NiAzOS4yNiI+PC9wb2x5Z29uPgogICAgPHBhdGggZmlsbD0iI0ZGRkZGRiIgZD0iTTIwMS45MiwzMWMuNzgtLjY1LjkyLTEuNDYuOTItMi4xOHYtMy4wNGgtNC4yNXY0LjEzYzAsLjU5LS40OCwxLjA3LTEuMDcsMS4wN3MtMS4wMy0uNDgtMS4wMy0xLjA3di0xMS42OWMwLS41OS40NC0xLjA3LDEuMDMtMS4wN3MxLjA3LjQ4LDEuMDcsMS4wN3Y0LjE1aDQuMjR2LTQuMzFjMC0yLjM4LTEuNTUtNC4zNC01LjM1LTQuMzQtMy44OSwwLTUuMzYsMS45Ny01LjM2LDQuMzV2MTIuMjFjMCwyLjM2LDEuODcsNC4xNSw0LjI3LDQuMTVoMS4zMmw0LjIxLTMuNDFaIj48L3BhdGg+CiAgICA8cG9seWdvbiBmaWxsPSIjRkZGRkZGIiBwb2ludHM9IjIxOC42NyAzMS40OCAyMTguNjcgMTguMDYgMjE1Ljc0IDE4LjA2IDIxNS43NCAxNC4xIDIyNi4zNSAxNC4xIDIyNi4zNSAxOC4wNiAyMjMuNCAxOC4wNiAyMjMuNCAzNC4zOSAyMjIuMTQgMzQuMzkgMjE4LjY3IDMxLjQ4Ij48L3BvbHlnb24+CiAgICA8cG9seWdvbiBmaWxsPSIjRkZDQzAwIiBwb2ludHM9IjIyMC41NyAzNC40MSAyMTAuMjQgMjUuNzYgMTk5LjUzIDM0LjQxIDIyMC41NyAzNC40MSI+PC9wb2x5Z29uPgogICAgPHBhdGggZmlsbD0iI0ZGRkZGRiIgZD0iTTIxMy4xOSwxNC4xM2gtNS45MmwtMy40NSwxNS40Nyw2LjQyLTUuMTgsNi42OSw1LjYxLTMuNzUtMTUuOVpNMjA5LjA5LDIzLjQybDEuMTQtNS44NSwxLjE0LDUuODVoLTIuMjhaIj48L3BhdGg+CiAgPC9nPgogIDxyZWN0IGZpbGw9Im5vbmUiIHg9IjIxLjI2IiB5PSIxMy43MSIgd2lkdGg9IjEzNS40NCIgaGVpZ2h0PSI0NC4xOSI+PC9yZWN0PgogIDxnPgogICAgPHBhdGggZmlsbD0iI0ZGRkZGRiIgZD0iTTIxLjI2LDI0LjMzaDUuMzVjMS42OSwwLDIuOTcuMTUsMy44NC40NHMxLjU3Ljg4LDIuMTEsMS43N2MuNTQuODkuOCwyLjMzLjgsNC4zMSwwLDEuMzQtLjE5LDIuMjctLjU3LDIuOC0uMzguNTMtMS4xMy45NC0yLjI0LDEuMjIsMS4yNC4zMSwyLjA5LjgzLDIuNTMsMS41Ni40NC43Mi42NywxLjgzLjY3LDMuMzJ2Mi4xM2MwLDEuNTUtLjE2LDIuNzEtLjQ4LDMuNDUtLjMyLjc1LS44MywxLjI2LTEuNTIsMS41My0uNy4yOC0yLjEyLjQxLTQuMjguNDFoLTYuMjF2LTIyLjk0Wk0yNi42NCwyOC4yNHY1LjA3Yy4yMywwLC40LS4wMi41Mi0uMDIuNTEsMCwuODQtLjE0Ljk4LS40My4xNC0uMjguMjEtMS4xLjIxLTIuNDYsMC0uNzEtLjA2LTEuMjItLjE3LTEuNS0uMTItLjI5LS4yNy0uNDYtLjQ1LS41NC0uMTktLjA3LS41NS0uMTItMS4wOS0uMTNaTTI2LjY0LDM2LjkxdjYuNDVjLjc0LS4wMywxLjIxLS4xNiwxLjQxLS40LjItLjI0LjMtLjgyLjMtMS43NXYtMi4xNWMwLS45OC0uMDktMS41OC0uMjctMS43OS0uMTgtLjIxLS42Ni0uMzMtMS40NC0uMzZaIj48L3BhdGg+CiAgICA8cGF0aCBmaWxsPSIjRkZGRkZGIiBkPSJNNDYuMjQsMjQuMzNsMy4xMSwyMi45NGgtNS40N2wtLjI5LTQuMTJoLTEuOTZsLS4zLDQuMTJoLTUuNTZsMi43My0yMi45NGg3Ljc1Wk00My40LDM5LjA4Yy0uMjQtMi41OS0uNTEtNS44Mi0uNzktOS42Ny0uNTIsNC40Mi0uODUsNy42NS0uOTksOS42N2gxLjc4WiI+PC9wYXRoPgogICAgPHBhdGggZmlsbD0iI0ZGRkZGRiIgZD0iTTYwLjk3LDI0LjMzdjQuNmgtMy4xOXYxOC4zNGgtNS4zOHYtMTguMzRoLTMuMTl2LTQuNmgxMS43N1oiPjwvcGF0aD4KICAgIDxwYXRoIGZpbGw9IiNGRkZGRkYiIGQ9Ik03NC4zNCwyNC4zM3Y0LjZoLTMuMTl2MTguMzRoLTUuMzl2LTE4LjM0aC0zLjE5di00LjZoMTEuNzdaIj48L3BhdGg+CiAgICA8cGF0aCBmaWxsPSIjRkZGRkZGIiBkPSJNODIuMjYsMjQuMzN2MTguMzRoMy4yNHY0LjZoLTguNjJ2LTIyLjk0aDUuMzhaIj48L3BhdGg+CiAgICA8cGF0aCBmaWxsPSIjRkZGRkZGIiBkPSJNODguMTQsMjQuMzNoOC45NnY0LjZoLTMuNTd2NC4zNGgzLjMzdjQuMzloLTMuMzN2NS4wMmgzLjkxdjQuNmgtOS4yOXYtMjIuOTRaIj48L3BhdGg+CiAgICA8cGF0aCBmaWxsPSIjRkZGRkZGIiBkPSJNMTAwLjMyLDI0LjMzaDkuMDV2NC42aC0zLjY3djQuMzRoMy4yNHY0LjM5aC0zLjI0djkuNjJoLTUuMzl2LTIyLjk0WiI+PC9wYXRoPgogICAgPHBhdGggZmlsbD0iI0ZGRkZGRiIgZD0iTTExNy40MiwyNC4zM3YyMi45NGgtNS4zOXYtMjIuOTRoNS4zOVoiPjwvcGF0aD4KICAgIDxwYXRoIGZpbGw9IiNGRkZGRkYiIGQ9Ik0xMjAuODcsMjQuMzNoOC45NnY0LjZoLTMuNTd2NC4zNGgzLjMzdjQuMzloLTMuMzN2NS4wMmgzLjkxdjQuNmgtOS4yOXYtMjIuOTRaIj48L3BhdGg+CiAgICA8cGF0aCBmaWxsPSIjRkZGRkZGIiBkPSJNMTM4LjQzLDI0LjMzdjE4LjM0aDMuMjR2NC42aC04LjYydi0yMi45NGg1LjM4WiI+PC9wYXRoPgogICAgPHBhdGggZmlsbD0iI0ZGRkZGRiIgZD0iTTE0NC4zLDI0LjMzaDQuMDFjMi41OCwwLDQuMzMuMTMsNS4yNC40LjkxLjI2LDEuNi43LDIuMDgsMS4zLjQ3LjYuNzcsMS4yOC44OSwyLjAyLjEyLjc0LjE4LDIuMi4xOCw0LjM3djguMDRjMCwyLjA1LS4wOSwzLjQzLS4yNiw0LjEzLS4xNy42OS0uNDcsMS4yNC0uOTEsMS42My0uNDMuMzktLjk3LjY3LTEuNi44Mi0uNjQuMTUtMS42LjIzLTIuODcuMjNoLTYuNzV2LTIyLjk0Wk0xNDkuNjksMjguMjR2MTUuMTJjLjc0LDAsMS4xOS0uMTgsMS4zNy0uNTIuMTctLjM1LjI1LTEuMjkuMjUtMi44MnYtOC45M2MwLTEuMDQtLjAzLTEuNzEtLjA4LTItLjA2LS4yOS0uMTktLjUxLS4zOS0uNjUtLjIxLS4xNC0uNTktLjIxLTEuMTUtLjIxWiI+PC9wYXRoPgogIDwvZz4KPC9zdmc+" alt="Battlefield Equipment Rentals, Cat Rentals dealer">
+    <div class="app-title">
+      <span class="eyebrow">Battlefield Equipment Rentals</span>
+      <h1>Temporary Fence Rental Quote</h1>
+    </div>
+    <div class="top-actions">
+      <button class="rep-chip" id="repChip" type="button" aria-label="Edit your contact info">
+        <span class="rep-avatar" id="repAvatar">?</span>
+        <span><span class="rep-name" id="repChipName" style="display:block">Add your contact info</span><span class="rep-sub" id="repChipSub" style="display:block">Saved in this browser</span></span>
+      </button>
+      <button class="btn btn-outline btn-sm" id="openSaved" type="button">Saved quotes <span id="savedCount" class="num"></span></button>
+      <button class="btn btn-black btn-sm" id="newQuote" type="button">New quote</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="form" id="form">
+    <div class="banner" id="repBanner" hidden>
+      <p><strong>Set up your contact info once.</strong> Your name, phone and email go on every quote and email. They're saved in this browser, so you only enter them the first time.</p>
+      <button class="btn" type="button" id="repBannerBtn">Add my info</button>
+    </div>
+    <div class="banner" id="exampleBanner" hidden>
+      <p><strong>New quote.</strong> Fill in the customer and footage below, or load an example to see how the totals work.</p>
+      <button class="btn btn-outline" type="button" id="loadExample">Load example</button>
+    </div>
+
+    <section class="card" aria-labelledby="h-cust">
+      <div class="card-h"><h2 id="h-cust">Customer &amp; jobsite</h2><span class="sub">Appears at the top of the quote</span></div>
+      <div class="card-b">
+        <div class="grid">
+          <div class="field"><label for="c_name">Customer name</label><input class="inp" id="c_name" data-k="customer.name" autocomplete="off"></div>
+          <div class="field"><label for="c_company">Company</label><input class="inp" id="c_company" data-k="customer.company" autocomplete="off"></div>
+          <div class="field"><label for="c_phone">Phone</label><input class="inp" id="c_phone" data-k="customer.phone" type="tel" autocomplete="off"></div>
+          <div class="field"><label for="c_email">Email</label><input class="inp" id="c_email" data-k="customer.email" type="email" autocomplete="off"></div>
+          <div class="field" style="grid-column: 1 / -1"><label for="c_site">Jobsite location</label><input class="inp" id="c_site" data-k="customer.site" autocomplete="off" placeholder="Street address, city"></div>
+          <div class="field"><label for="c_fax">Fax <span style="font-weight:400;letter-spacing:0;text-transform:none;color:var(--muted)">(optional)</span></label><input class="inp" id="c_fax" data-k="customer.fax" type="tel" autocomplete="off"></div>
+        </div>
+        <div class="grid-3">
+          <div class="field"><label for="q_date">Quote date</label><input class="inp" id="q_date" data-k="quoteDate" type="date"></div>
+          <div class="field"><label for="q_delivery">Est. delivery date</label><input class="inp" id="q_delivery" data-k="deliveryDate" type="date"></div>
+          <div class="field"><label for="q_valid">Valid until</label><input class="inp" id="q_valid" data-k="validUntil" type="date"><span class="hint" id="validHint">30 days from the quote date</span></div>
+          <div class="field"><label for="q_periods">Rental term</label>
+            <div class="qty" style="display:flex;gap:8px;align-items:center"><input class="inp num" id="q_periods" data-k="periods" data-num="1" type="number" min="1" step="1" inputmode="numeric" style="text-align:right;max-width:90px"><span class="hint" style="font-size:13px">× 4-week periods</span></div>
+            <span class="hint">Applies to every monthly charge</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="h-a">
+      <div class="card-h"><h2 id="h-a"><span class="part">Part A</span>Monthly fence rental</h2><span class="subtotal money" id="subA">$0.00</span></div>
+      <div class="card-b">
+        <p class="note">Temporary fencing comes with all bases, clips, gates and castors necessary, as per customer request. Panels are 10' wide.</p>
+        <div class="lines" id="linesA"></div>
+        <p class="note" id="panelNote"></p>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="h-b">
+      <div class="card-h"><h2 id="h-b"><span class="part">Part B</span>Delivery &amp; installation</h2><span class="subtotal money" id="subB">$0.00</span></div>
+      <div class="card-b">
+        <div class="seg" role="radiogroup" aria-label="Delivery service">
+          <label class="opt"><input type="radio" name="svc" value="setup" id="svc_setup"><span><span class="t" style="display:block">Set up &amp; take down</span><span class="d">$2.00 per linear foot. Drop off &amp; pick up included.</span></span></label>
+          <label class="opt"><input type="radio" name="svc" value="dropoff" id="svc_drop"><span><span class="t" style="display:block">Drop off &amp; pick up only</span><span class="d">$1.17 per linear foot. No set up or take down.</span></span></label>
+        </div>
+        <div class="lines" id="linesB"></div>
+        <label class="check"><input type="checkbox" id="b_lfAuto"> Use the total fence footage from Part A</label>
+        <p class="note"><b>$500 minimum:</b> the service charge rounds up to $500 when it comes in under that. <b>Additional trips</b> to the site carry a minimum mobilization fee of $250 (one-way).</p>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="h-c">
+      <div class="card-h"><h2 id="h-c"><span class="part">Part C</span>Add-ons (sale &amp; rent)</h2><span class="subtotal money" id="subC">$0.00</span></div>
+      <div class="card-b">
+        <h3 class="subhead">Privacy screening</h3>
+        <div class="grid-3">
+          <div class="field"><label for="s_height">Screen</label>
+            <select class="inp" id="s_height" data-k="c.screenHeight">
+              <option value="none">No privacy screen</option>
+              <option value="6">6' unbranded</option>
+              <option value="8">8' unbranded</option>
+            </select></div>
+          <div class="field"><label for="s_mode">Supply</label>
+            <select class="inp" id="s_mode" data-k="c.screenMode">
+              <option value="supply">Supply only (sold per 150' roll)</option>
+              <option value="setup">Supply &amp; set up (per linear ft)</option>
+            </select></div>
+          <div class="field"><label for="s_lf">Linear feet of screen</label><input class="inp num" id="s_lf" data-k="c.screenLF" data-num="1" type="number" min="0" step="1" inputmode="numeric" style="text-align:right"><span class="hint" id="s_lfHint"></span></div>
+        </div>
+        <div class="lines" id="linesScreen"></div>
+
+        <h3 class="subhead">Safety clamps &amp; wind braces</h3>
+        <div class="lines" id="linesCB"></div>
+
+        <h3 class="subhead">Other add-ons</h3>
+        <div class="lines" id="linesCO"></div>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="h-n">
+      <div class="card-h"><h2 id="h-n">Notes for the customer</h2><span class="sub">Optional. Printed on the quote.</span></div>
+      <div class="card-b">
+        <div class="field"><label for="q_notes" class="lbl">Notes</label><textarea class="inp" id="q_notes" data-k="notes" placeholder="Gate locations, site access, delivery window..."></textarea></div>
+      </div>
+    </section>
+  </div>
+
+  <aside class="summary" aria-label="Quote summary">
+    <div class="sum-card">
+      <div class="sum-head">
+        <div><div class="lbl" style="font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:600">Quote</div><div class="qno" id="sumNo">Not saved yet</div></div>
+        <div class="state" id="sumState">Draft</div>
+      </div>
+      <div class="sum-body">
+        <div class="sum-row"><span>Part A · Fence rental</span><span id="sumA">$0.00</span></div>
+        <div class="sum-row"><span>Part B · Delivery &amp; install</span><span id="sumB">$0.00</span></div>
+        <div class="sum-row"><span>Part C · Add-ons</span><span id="sumC">$0.00</span></div>
+      </div>
+      <div class="sum-total">
+        <span class="lbl" style="font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:600">Total estimated cost</span>
+        <span class="big" id="sumTotal">$0.00</span>
+        <span class="tax">Taxes extra. Net prices, no further discounts.</span>
+      </div>
+      <div class="sum-facts">
+        <div><b id="sumPanels">0</b><small>Fence panels</small></div>
+        <div><b id="sumLF">0</b><small>Linear feet</small></div>
+      </div>
+      <div class="sum-actions">
+        <ul class="warnings" id="warnings"></ul>
+        <button class="btn btn-black btn-block" id="saveBtn" type="button">Save quote</button>
+        <div class="row">
+          <button class="btn btn-outline" id="previewBtn" type="button">Preview</button>
+          <button class="btn" id="pdfBtn" type="button">Download PDF</button>
+        </div>
+        <a class="btn btn-outline btn-block" id="emailBtn" href="#">Email quote</a>
+        <p class="status" id="status" role="status"></p>
+      </div>
+      <div class="email-box" id="emailBox" hidden>
+        <span class="lbl">Email to the customer</span>
+        <span class="to" id="emailTo"></span>
+        <span class="note">Attach the PDF you downloaded. If your email app didn't open, copy the text below into a new message.</span>
+        <div class="row">
+          <button class="btn btn-outline btn-sm" type="button" id="copySubject">Copy subject</button>
+          <button class="btn btn-outline btn-sm" type="button" id="copyBody">Copy message</button>
+          <button class="btn btn-outline btn-sm" type="button" id="copyTo">Copy address</button>
+        </div>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<!-- Rep contact dialog -->
+<dialog id="repDlg" aria-labelledby="repDlgTitle">
+  <form method="dialog" id="repForm">
+    <div class="dlg-h"><h2 id="repDlgTitle">Your contact info</h2><button class="x" value="cancel" formnovalidate aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="dlg-b">
+      <p class="note">Shown on every quote and email you send. Saved in this browser only, so you enter it once per computer.</p>
+      <div class="grid">
+        <div class="field"><label for="r_name">Full name</label><input class="inp" id="r_name" required autocomplete="name"></div>
+        <div class="field"><label for="r_title">Title</label><input class="inp" id="r_title" placeholder="Rental Sales Representative" autocomplete="organization-title"></div>
+        <div class="field"><label for="r_branch">Branch</label><input class="inp" id="r_branch" placeholder="Branch name or city"></div>
+        <div class="field"><label for="r_email">Email</label><input class="inp" id="r_email" type="email" required autocomplete="email"></div>
+        <div class="field"><label for="r_phone">Office phone</label><input class="inp" id="r_phone" type="tel" autocomplete="tel"></div>
+        <div class="field"><label for="r_mobile">Mobile</label><input class="inp" id="r_mobile" type="tel"></div>
+      </div>
+    </div>
+    <div class="dlg-f">
+      <button class="btn btn-ghost" value="cancel" formnovalidate>Cancel</button>
+      <button class="btn" id="repSave" value="save">Save my info</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Saved quotes dialog -->
+<dialog id="savedDlg" aria-labelledby="savedDlgTitle">
+  <div class="dlg-h"><h2 id="savedDlgTitle">Saved quotes</h2><button class="x" type="button" id="closeSaved" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="dlg-b">
+    <input class="inp" id="savedSearch" type="search" placeholder="Search by quote number, customer, company or jobsite">
+    <p class="note" id="savedDirty" hidden>The quote you're working on has unsaved changes. Opening another quote will replace it.</p>
+    <div class="saved-list" id="savedList"></div>
+  </div>
+</dialog>
+
+<!-- Preview dialog -->
+<dialog id="previewDlg" aria-labelledby="previewDlgTitle">
+  <div class="dlg-h"><h2 id="previewDlgTitle">Quote preview</h2><button class="x" type="button" id="closePreview" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="dlg-b"><div class="preview-scroll" id="previewBody"></div></div>
+  <div class="dlg-f"><button class="btn btn-ghost" type="button" id="closePreview2">Close</button><button class="btn" type="button" id="pdfBtn2">Download PDF</button></div>
+</dialog>
+
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function () {
+  "use strict";
+  var LOGO = "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIj8+CjxzdmcgaWQ9IkNvbG9yX05PX0tleWxpbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgMjg4IDcyIj4KICAKICA8ZGVmcz4KICAgIAogIDwvZGVmcz4KICA8Zz4KICAgIDxyZWN0IHg9IjE3Ny45NSIgd2lkdGg9IjExMC4wNSIgaGVpZ2h0PSI3MiI+PC9yZWN0PgogICAgPHJlY3QgZmlsbD0iI0FGMEUwRSIgd2lkdGg9IjE3Ny45NSIgaGVpZ2h0PSI3MiI+PC9yZWN0PgogICAgPHBhdGggZmlsbD0iI0ZGRkZGRiIgZD0iTTE5Ny40Myw0NS42M2wtMS4xMS4wM3YtNC42aDEuMjdjLjk2LDAsMS4yOC43MywxLjI4LDIuMzNzLS4zNSwyLjI0LTEuNDQsMi4yNE0yMDMuMDIsNTYuMTJ2LTQuOTNjMC0yLjM0LS44LTMuNy0yLjUyLTQuMDIsMi0uNTUsMi41NC0yLjI5LDIuNTQtNC41MiwwLTMuMTQtMS4wOS01LjA5LTQuNjEtNS4wOWgtNi4zMXYyMC4zM2g0LjIxdi04Ljg0aDEuMDRjMS4wMSwwLDEuNDkuNzIsMS40OSwxLjY5djUuNDFjMCwuOS4xOCwxLjU2LjI5LDEuNzRoNC4yNWMtLjE1LS4xNy0uMzctLjg3LS4zNy0xLjc3Ij48L3BhdGg+CiAgICA8cG9seWdvbiBmaWxsPSIjRkZGRkZGIiBwb2ludHM9IjI1Mi44NiAzNy41NiAyNTIuODYgNTcuOSAyNjEuNjcgNTcuOSAyNjEuNjcgNTQuMDQgMjU3LjE4IDU0LjA0IDI1Ny4xOCAzNy41NiAyNTIuODYgMzcuNTYiPjwvcG9seWdvbj4KICAgIDxwb2x5Z29uIGZpbGw9IiNGRkZGRkYiIHBvaW50cz0iMjA0Ljk5IDM3LjU1IDIwNSAzNy41NSAyMDUgNTcuODkgMjE0LjYyIDU3Ljg5IDIxNC42MiA1My45NyAyMDkuMzEgNTMuOTcgMjA5LjMxIDQ5LjQ1IDIxMy43OCA0OS40NSAyMTMuNzggNDUuNDcgMjA5LjMxIDQ1LjQ3IDIwOS4zMSA0MS40NCAyMTQuNDQgNDEuNDQgMjE0LjQ0IDM3LjU1IDIwNC45OSAzNy41NSI+PC9wb2x5Z29uPgogICAgPHBvbHlnb24gZmlsbD0iI0ZGRkZGRiIgcG9pbnRzPSIyMjAuNCAzNy41NyAyMjQuMTggNDggMjI0LjE4IDM3LjU3IDIyOC4yOCAzNy41NyAyMjguMjggNTcuODkgMjI0LjQ1IDU3Ljg5IDIyMC40IDQ3LjYgMjIwLjQgNTcuODkgMjE2LjIyIDU3Ljg5IDIxNi4yMiAzNy41NyAyMjAuNCAzNy41NyI+PC9wb2x5Z29uPgogICAgPHBhdGggZmlsbD0iI0ZGRkZGRiIgZD0iTTI3My42NCw0My42OGgtNC4xdi0xLjM5YzAtLjY0LS4yNC0xLjM4LTEuMDctMS4zOC0uNjEsMC0xLjI3LjM3LTEuMzUsMS4xLS4xNCwxLjM3Ljc1LDIuMjYsMS42NiwzLjEzLDIuNCwyLjMyLDUuMyw0LjE5LDUuMDgsNy45OS0uMTIsMi4xMy0xLjQxLDQuMDYtMy40MSw0LjgzLTIuMjQuODUtNS42NS4zNy03LjA4LTEuNzItLjk3LTEuNDEtLjkyLTIuOTktLjg4LTQuNjRoNC4wN3YxLjQ5YzAsLjY4LjQzLDEuMzksMS4xNCwxLjQ4LDEuMzYuMTgsMS44My0uNzcsMS42Mi0xLjk4LS4xLS41OC0uMzgtMS4wNC0uNzUtMS40OC0xLjY2LTItNC4xLTMuMzMtNS4zMS01LjctMS42NC0zLjE5LS4wNy03LjMyLDMuNTUtOC4xMSwyLjE4LS40OCw0LjUzLjAzLDUuODYsMS45MS45NSwxLjM1LDEuMDMsMi44Ny45OCw0LjQ3Ij48L3BhdGg+CiAgICA8cG9seWdvbiBmaWxsPSIjRkZGRkZGIiBwb2ludHM9IjIzOS44MyAzNy41NyAyMzkuODMgNDEuNTIgMjM3IDQxLjUyIDIzNyA1Ny44OSAyMzIuNDIgNTcuODkgMjMyLjQyIDQxLjUyIDIyOS41OSA0MS41MiAyMjkuNTkgMzcuNTcgMjM5LjgzIDM3LjU3Ij48L3BvbHlnb24+CiAgICA8cGF0aCBmaWxsPSIjRkZGRkZGIiBkPSJNMjQ1LjM1LDQxLjEzbDEuMDksOS40N2gtMi4xOGwxLjA5LTkuNDdaTTI0Mi41MiwzNy41N2wtMy4zNSwyMC4zMmg0LjI1bC40MS0zLjU5aDMuMDNzLjQxLDMuNTkuNDEsMy41OWg0LjI1bC0zLjM3LTIwLjMyaC01LjY0WiI+PC9wYXRoPgogICAgPHBhdGggZmlsbD0iI0ZGRkZGRiIgZD0iTTI3Ni4wNCwzOS4yOWMtLjU0LDAtLjY0LS4zMi0uNjItLjY4aC40NGMwLC4yLDAsLjM3LjI1LjM3LjE1LDAsLjIyLS4xLjIyLS4yNCwwLS4zOC0uODgtLjQtLjg4LTEuMDIsMC0uMzMuMTYtLjU5LjY5LS41OS40MywwLC42NC4xOS42MS42M2gtLjQzYzAtLjE2LS4wMy0uMzItLjItLjMyLS4xNCwwLS4yMy4wOC0uMjMuMjIsMCwuNC44OC4zNi44OCwxLjAyLDAsLjU0LS40LjYxLS43My42MSI+PC9wYXRoPgogICAgPHBvbHlnb24gZmlsbD0iI0ZGRkZGRiIgcG9pbnRzPSIyNzYuOTYgMzkuMjYgMjc2Ljk2IDM3LjE3IDI3Ny42NiAzNy4xNyAyNzcuOTkgMzguNTkgMjc4IDM4LjU5IDI3OC4zNCAzNy4xNyAyNzkuMDIgMzcuMTcgMjc5LjAyIDM5LjI2IDI3OC42IDM5LjI2IDI3OC42IDM3LjY1IDI3OC41OSAzNy42NSAyNzguMTkgMzkuMjYgMjc3Ljc3IDM5LjI2IDI3Ny4zOSAzNy42NSAyNzcuMzggMzcuNjUgMjc3LjM4IDM5LjI2IDI3Ni45NiAzOS4yNiI+PC9wb2x5Z29uPgogICAgPHBhdGggZmlsbD0iI0ZGRkZGRiIgZD0iTTIwMS45MiwzMWMuNzgtLjY1LjkyLTEuNDYuOTItMi4xOHYtMy4wNGgtNC4yNXY0LjEzYzAsLjU5LS40OCwxLjA3LTEuMDcsMS4wN3MtMS4wMy0uNDgtMS4wMy0xLjA3di0xMS42OWMwLS41OS40NC0xLjA3LDEuMDMtMS4wN3MxLjA3LjQ4LDEuMDcsMS4wN3Y0LjE1aDQuMjR2LTQuMzFjMC0yLjM4LTEuNTUtNC4zNC01LjM1LTQuMzQtMy44OSwwLTUuMzYsMS45Ny01LjM2LDQuMzV2MTIuMjFjMCwyLjM2LDEuODcsNC4xNSw0LjI3LDQuMTVoMS4zMmw0LjIxLTMuNDFaIj48L3BhdGg+CiAgICA8cG9seWdvbiBmaWxsPSIjRkZGRkZGIiBwb2ludHM9IjIxOC42NyAzMS40OCAyMTguNjcgMTguMDYgMjE1Ljc0IDE4LjA2IDIxNS43NCAxNC4xIDIyNi4zNSAxNC4xIDIyNi4zNSAxOC4wNiAyMjMuNCAxOC4wNiAyMjMuNCAzNC4zOSAyMjIuMTQgMzQuMzkgMjE4LjY3IDMxLjQ4Ij48L3BvbHlnb24+CiAgICA8cG9seWdvbiBmaWxsPSIjRkZDQzAwIiBwb2ludHM9IjIyMC41NyAzNC40MSAyMTAuMjQgMjUuNzYgMTk5LjUzIDM0LjQxIDIyMC41NyAzNC40MSI+PC9wb2x5Z29uPgogICAgPHBhdGggZmlsbD0iI0ZGRkZGRiIgZD0iTTIxMy4xOSwxNC4xM2gtNS45MmwtMy40NSwxNS40Nyw2LjQyLTUuMTgsNi42OSw1LjYxLTMuNzUtMTUuOVpNMjA5LjA5LDIzLjQybDEuMTQtNS44NSwxLjE0LDUuODVoLTIuMjhaIj48L3BhdGg+CiAgPC9nPgogIDxyZWN0IGZpbGw9Im5vbmUiIHg9IjIxLjI2IiB5PSIxMy43MSIgd2lkdGg9IjEzNS40NCIgaGVpZ2h0PSI0NC4xOSI+PC9yZWN0PgogIDxnPgogICAgPHBhdGggZmlsbD0iI0ZGRkZGRiIgZD0iTTIxLjI2LDI0LjMzaDUuMzVjMS42OSwwLDIuOTcuMTUsMy44NC40NHMxLjU3Ljg4LDIuMTEsMS43N2MuNTQuODkuOCwyLjMzLjgsNC4zMSwwLDEuMzQtLjE5LDIuMjctLjU3LDIuOC0uMzguNTMtMS4xMy45NC0yLjI0LDEuMjIsMS4yNC4zMSwyLjA5LjgzLDIuNTMsMS41Ni40NC43Mi42NywxLjgzLjY3LDMuMzJ2Mi4xM2MwLDEuNTUtLjE2LDIuNzEtLjQ4LDMuNDUtLjMyLjc1LS44MywxLjI2LTEuNTIsMS41My0uNy4yOC0yLjEyLjQxLTQuMjguNDFoLTYuMjF2LTIyLjk0Wk0yNi42NCwyOC4yNHY1LjA3Yy4yMywwLC40LS4wMi41Mi0uMDIuNTEsMCwuODQtLjE0Ljk4LS40My4xNC0uMjguMjEtMS4xLjIxLTIuNDYsMC0uNzEtLjA2LTEuMjItLjE3LTEuNS0uMTItLjI5LS4yNy0uNDYtLjQ1LS41NC0uMTktLjA3LS41NS0uMTItMS4wOS0uMTNaTTI2LjY0LDM2LjkxdjYuNDVjLjc0LS4wMywxLjIxLS4xNiwxLjQxLS40LjItLjI0LjMtLjgyLjMtMS43NXYtMi4xNWMwLS45OC0uMDktMS41OC0uMjctMS43OS0uMTgtLjIxLS42Ni0uMzMtMS40NC0uMzZaIj48L3BhdGg+CiAgICA8cGF0aCBmaWxsPSIjRkZGRkZGIiBkPSJNNDYuMjQsMjQuMzNsMy4xMSwyMi45NGgtNS40N2wtLjI5LTQuMTJoLTEuOTZsLS4zLDQuMTJoLTUuNTZsMi43My0yMi45NGg3Ljc1Wk00My40LDM5LjA4Yy0uMjQtMi41OS0uNTEtNS44Mi0uNzktOS42Ny0uNTIsNC40Mi0uODUsNy42NS0uOTksOS42N2gxLjc4WiI+PC9wYXRoPgogICAgPHBhdGggZmlsbD0iI0ZGRkZGRiIgZD0iTTYwLjk3LDI0LjMzdjQuNmgtMy4xOXYxOC4zNGgtNS4zOHYtMTguMzRoLTMuMTl2LTQuNmgxMS43N1oiPjwvcGF0aD4KICAgIDxwYXRoIGZpbGw9IiNGRkZGRkYiIGQ9Ik03NC4zNCwyNC4zM3Y0LjZoLTMuMTl2MTguMzRoLTUuMzl2LTE4LjM0aC0zLjE5di00LjZoMTEuNzdaIj48L3BhdGg+CiAgICA8cGF0aCBmaWxsPSIjRkZGRkZGIiBkPSJNODIuMjYsMjQuMzN2MTguMzRoMy4yNHY0LjZoLTguNjJ2LTIyLjk0aDUuMzhaIj48L3BhdGg+CiAgICA8cGF0aCBmaWxsPSIjRkZGRkZGIiBkPSJNODguMTQsMjQuMzNoOC45NnY0LjZoLTMuNTd2NC4zNGgzLjMzdjQuMzloLTMuMzN2NS4wMmgzLjkxdjQuNmgtOS4yOXYtMjIuOTRaIj48L3BhdGg+CiAgICA8cGF0aCBmaWxsPSIjRkZGRkZGIiBkPSJNMTAwLjMyLDI0LjMzaDkuMDV2NC42aC0zLjY3djQuMzRoMy4yNHY0LjM5aC0zLjI0djkuNjJoLTUuMzl2LTIyLjk0WiI+PC9wYXRoPgogICAgPHBhdGggZmlsbD0iI0ZGRkZGRiIgZD0iTTExNy40MiwyNC4zM3YyMi45NGgtNS4zOXYtMjIuOTRoNS4zOVoiPjwvcGF0aD4KICAgIDxwYXRoIGZpbGw9IiNGRkZGRkYiIGQ9Ik0xMjAuODcsMjQuMzNoOC45NnY0LjZoLTMuNTd2NC4zNGgzLjMzdjQuMzloLTMuMzN2NS4wMmgzLjkxdjQuNmgtOS4yOXYtMjIuOTRaIj48L3BhdGg+CiAgICA8cGF0aCBmaWxsPSIjRkZGRkZGIiBkPSJNMTM4LjQzLDI0LjMzdjE4LjM0aDMuMjR2NC42aC04LjYydi0yMi45NGg1LjM4WiI+PC9wYXRoPgogICAgPHBhdGggZmlsbD0iI0ZGRkZGRiIgZD0iTTE0NC4zLDI0LjMzaDQuMDFjMi41OCwwLDQuMzMuMTMsNS4yNC40LjkxLjI2LDEuNi43LDIuMDgsMS4zLjQ3LjYuNzcsMS4yOC44OSwyLjAyLjEyLjc0LjE4LDIuMi4xOCw0LjM3djguMDRjMCwyLjA1LS4wOSwzLjQzLS4yNiw0LjEzLS4xNy42OS0uNDcsMS4yNC0uOTEsMS42My0uNDMuMzktLjk3LjY3LTEuNi44Mi0uNjQuMTUtMS42LjIzLTIuODcuMjNoLTYuNzV2LTIyLjk0Wk0xNDkuNjksMjguMjR2MTUuMTJjLjc0LDAsMS4xOS0uMTgsMS4zNy0uNTIuMTctLjM1LjI1LTEuMjkuMjUtMi44MnYtOC45M2MwLTEuMDQtLjAzLTEuNzEtLjA4LTItLjA2LS4yOS0uMTktLjUxLS4zOS0uNjUtLjIxLS4xNC0uNTktLjIxLTEuMTUtLjIxWiI+PC9wYXRoPgogIDwvZz4KPC9zdmc+";
+  // PDF renderer draws PNG more reliably than SVG, so rasterize the lockup once.
+  var LOGO_PNG = LOGO;
+  (function () {
+    var img = new Image();
+    img.onload = function () {
+      try {
+        var c = document.createElement("canvas"); c.width = 1152; c.height = 288;
+        c.getContext("2d").drawImage(img, 0, 0, 1152, 288);
+        LOGO_PNG = c.toDataURL("image/png");
+      } catch (e) { LOGO_PNG = LOGO; }
+    };
+    img.src = LOGO;
+  })();
+  var KEY = { rep: "bfr.fenceQuote.rep", quotes: "bfr.fenceQuote.quotes", counter: "bfr.fenceQuote.counter", draft: "bfr.fenceQuote.draft" };
+
+  // Fixed rates from the Temporary Fencing Rental Quotation. Reps cannot change these.
+  var R = {
+    a4: 0.95, a6: 0.95, a8: 1.20,
+    setup: 2.00, dropoff: 1.17, minB: 500, weekend: 375, holiday: 775, mobilization: 250,
+    roll6: 375, lf6: 4.00, roll8: 425, lf8: 5.00, rollLen: 150,
+    sandbag: 12, clampInstall: 5, clampRent: 1, brace: 10, braceSetup: 5, braceTakedown: 5,
+    gate: 30, flexbase: 5, panelWidth: 10
+  };
+
+  // ---------- storage (every access guarded) ----------
+  function load(k, d) { try { var v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }
+  function store(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
+
+  // ---------- helpers ----------
+  var $ = function (id) { return document.getElementById(id); };
+  var fmt = new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", currencyDisplay: "narrowSymbol" });
+  function money(n) { return fmt.format(Math.round((n + Number.EPSILON) * 100) / 100); }
+  function int(n) { return new Intl.NumberFormat("en-CA").format(n); }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function n0(v) { v = parseFloat(v); return isFinite(v) && v > 0 ? v : 0; }
+  function today() { var d = new Date(); return iso(d); }
+  function iso(d) { var m = d.getMonth() + 1, day = d.getDate(); return d.getFullYear() + "-" + (m < 10 ? "0" : "") + m + "-" + (day < 10 ? "0" : "") + day; }
+  function addDays(s, n) { var p = s.split("-"); var d = new Date(+p[0], +p[1] - 1, +p[2]); d.setDate(d.getDate() + n); return iso(d); }
+  function longDate(s) { if (!s) return ""; var p = s.split("-"); var d = new Date(+p[0], +p[1] - 1, +p[2]); return d.toLocaleDateString("en-CA", { year: "numeric", month: "long", day: "numeric" }); }
+  function uid() { return "q" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  function get(o, path) { return path.split(".").reduce(function (a, k) { return a == null ? a : a[k]; }, o); }
+  function set(o, path, v) { var ks = path.split("."); var last = ks.pop(); var t = ks.reduce(function (a, k) { return a[k]; }, o); t[last] = v; }
+
+  function blankQuote() {
+    var d = today();
+    return {
+      id: uid(), number: "", createdAt: null, updatedAt: null,
+      customer: { name: "", company: "", site: "", phone: "", email: "", fax: "" },
+      quoteDate: d, deliveryDate: "", validUntil: addDays(d, 30), validAuto: true, periods: 1,
+      a: { lf4: 0, lf6: 0, lf8: 0 },
+      b: { service: "setup", lf: 0, lfAuto: true, weekends: 0, holidays: 0 },
+      c: { screenHeight: "none", screenMode: "supply", screenLF: 0, sandbags: null, clampsInstalled: 0, clampsRental: 0, braces: 0, braceSetup: 0, braceTakedown: 0, gates: 0, flexbases: 0 },
+      notes: ""
+    };
+  }
+  function exampleQuote() {
+    var q = blankQuote();
+    q.customer = { name: "Jordan Example", company: "Example Construction Ltd. (sample)", site: "123 Sample Road, Ottawa, ON", phone: "613-555-0100", email: "jordan@example.com", fax: "" };
+    q.deliveryDate = addDays(q.quoteDate, 7);
+    q.periods = 3;
+    q.a.lf6 = 400;
+    q.b.service = "setup"; q.b.weekends = 0;
+    q.c.screenHeight = "6"; q.c.screenMode = "setup"; q.c.screenLF = 200;
+    q.c.braces = 10; q.c.braceSetup = 10; q.c.braceTakedown = 10; q.c.gates = 2;
+    return q;
+  }
+
+  // ---------- calculation (mirrors the paper form) ----------
+  function compute(q) {
+    var p = Math.max(1, Math.round(n0(q.periods)) || 1);
+    var lf4 = n0(q.a.lf4), lf6 = n0(q.a.lf6), lf8 = n0(q.a.lf8);
+    var totalLF = lf4 + lf6 + lf8;
+    var panels = Math.ceil(totalLF / R.panelWidth);
+    var A = [
+      { key: "lf4", name: "4' H × 10' W fence panels", rate: R.a4, qty: lf4, unit: "LF", periods: p, amt: lf4 * R.a4 * p, rateText: money(R.a4) + " per linear ft per 4 weeks" },
+      { key: "lf6", name: "6' H × 10' W fence panels", rate: R.a6, qty: lf6, unit: "LF", periods: p, amt: lf6 * R.a6 * p, rateText: money(R.a6) + " per linear ft per 4 weeks" },
+      { key: "lf8", name: "8' H × 10' W fence panels", rate: R.a8, qty: lf8, unit: "LF", periods: p, amt: lf8 * R.a8 * p, rateText: money(R.a8) + " per linear ft per 4 weeks" }
+    ];
+    var subA = A.reduce(function (s, l) { return s + l.amt; }, 0);
+
+    var svcRate = q.b.service === "dropoff" ? R.dropoff : R.setup;
+    var bLF = q.b.lfAuto ? totalLF : n0(q.b.lf);
+    var svcRaw = bLF * svcRate;
+    var svcAmt = bLF > 0 ? Math.max(svcRaw, R.minB) : 0;
+    var minApplied = bLF > 0 && svcRaw < R.minB;
+    var wk = Math.round(n0(q.b.weekends)), hol = Math.round(n0(q.b.holidays));
+    var B = [
+      { key: "svc", name: q.b.service === "dropoff" ? "Drop off & pick up only" : "Set up & take down (drop off & pick up included)", qty: bLF, unit: "LF", amt: svcAmt, raw: svcRaw, minApplied: minApplied, rateText: money(svcRate) + " per linear ft" + (minApplied ? " · $500 minimum applied" : "") },
+      { key: "weekends", name: "Weekend fee", qty: wk, unit: "weekend", amt: wk * R.weekend, rateText: money(R.weekend) + " per weekend" },
+      { key: "holidays", name: "Holiday fee", qty: hol, unit: "holiday", amt: hol * R.holiday, rateText: money(R.holiday) + " per holiday" }
+    ];
+    var subB = B.reduce(function (s, l) { return s + l.amt; }, 0);
+
+    var c = q.c, C = [];
+    var sLF = c.screenHeight === "none" ? 0 : n0(c.screenLF);
+    var screenPanels = Math.ceil(sLF / R.panelWidth);
+    var sandReq = (c.screenHeight !== "none" && c.screenMode === "setup") ? screenPanels : 0;
+    var sandEntered = c.sandbags == null || c.sandbags === "" ? sandReq : Math.round(n0(c.sandbags));
+    var sand = Math.max(sandEntered, sandReq);
+    var screen = null;
+    if (c.screenHeight !== "none") {
+      var h = c.screenHeight;
+      if (c.screenMode === "supply") {
+        var rolls = Math.ceil(sLF / R.rollLen), rr = h === "8" ? R.roll8 : R.roll6;
+        screen = { key: "screen", group: "screen", name: h + "' unbranded privacy screen, supply only (150' × " + h + "' rolls)", qty: rolls, unit: rolls === 1 ? "roll" : "rolls", amt: rolls * rr, rateText: money(rr) + " per roll · " + int(sLF) + " LF needs " + rolls + (rolls === 1 ? " roll" : " rolls") };
+      } else {
+        var lr = h === "8" ? R.lf8 : R.lf6;
+        screen = { key: "screen", group: "screen", name: h + "' unbranded privacy screen, supply & set up", qty: sLF, unit: "LF", amt: sLF * lr, rateText: money(lr) + " per linear ft" };
+      }
+      C.push(screen);
+    }
+    C.push({ key: "sandbags", group: "screen", name: "Sandbags", qty: sand, unit: "bags", amt: sand * R.sandbag, rateText: money(R.sandbag) + " per sandbag (sale)" + (sandReq ? " · 1 per screened panel required" : "") });
+    var ci = Math.round(n0(c.clampsInstalled)), cr = Math.round(n0(c.clampsRental)), br = Math.round(n0(c.braces)), bs = Math.round(n0(c.braceSetup)), bt = Math.round(n0(c.braceTakedown)), g = Math.round(n0(c.gates)), fb = Math.round(n0(c.flexbases));
+    C.push({ key: "clampsInstalled", group: "cb", name: "Safety clamps installed", qty: ci, unit: "clamps", amt: ci * R.clampInstall, rateText: money(R.clampInstall) + " per clamp installed" });
+    C.push({ key: "clampsRental", group: "cb", name: "Safety clamp rental", qty: cr, unit: "clamps", periods: p, amt: cr * R.clampRent * p, rateText: money(R.clampRent) + " per clamp per 4 weeks" });
+    C.push({ key: "braces", group: "cb", name: "Wind brace rental", qty: br, unit: "braces", periods: p, amt: br * R.brace * p, rateText: money(R.brace) + " per brace per 4 weeks" });
+    C.push({ key: "braceSetup", group: "cb", name: "Wind brace set up", qty: bs, unit: "braces", amt: bs * R.braceSetup, rateText: money(R.braceSetup) + " per brace set up" });
+    C.push({ key: "braceTakedown", group: "cb", name: "Wind brace take down", qty: bt, unit: "braces", amt: bt * R.braceTakedown, rateText: money(R.braceTakedown) + " per brace take down" });
+    C.push({ key: "gates", group: "co", name: "Gates", qty: g, unit: "gates", amt: g * R.gate, rateText: money(R.gate) + " per gate" });
+    C.push({ key: "flexbases", group: "co", name: "Flexbase rental", qty: fb, unit: "flexbases", periods: p, amt: fb * R.flexbase * p, rateText: money(R.flexbase) + " per flexbase per 4 weeks" });
+    var subC = C.reduce(function (s, l) { return s + l.amt; }, 0);
+
+    return { periods: p, totalLF: totalLF, panels: panels, A: A, B: B, C: C, subA: subA, subB: subB, subC: subC, total: subA + subB + subC,
+      bLF: bLF, sLF: sLF, screenPanels: screenPanels, sandReq: sandReq, sandEntered: sandEntered, sand: sand };
+  }
+
+  // ---------- state ----------
+  var rep = load(KEY.rep, null);
+  var quotes = load(KEY.quotes, []);
+  if (!Array.isArray(quotes)) quotes = [];
+  var draft = load(KEY.draft, null);
+  var Q = draft && draft.q ? draft.q : blankQuote();
+  var dirty = !!(draft && draft.dirty);
+  var lastSavedJSON = null;
+
+  // ---------- line rows ----------
+  var ROWS = {
+    linesA: [["a.lf4", "lf4"], ["a.lf6", "lf6"], ["a.lf8", "lf8"]],
+    linesB: [["b.lf", "svc"], ["b.weekends", "weekends"], ["b.holidays", "holidays"]],
+    linesScreen: [["c.sandbags", "sandbags"]],
+    linesCB: [["c.clampsInstalled", "clampsInstalled"], ["c.clampsRental", "clampsRental"], ["c.braces", "braces"], ["c.braceSetup", "braceSetup"], ["c.braceTakedown", "braceTakedown"]],
+    linesCO: [["c.gates", "gates"], ["c.flexbases", "flexbases"]]
+  };
+  var UNITS = { lf4: "LF", lf6: "LF", lf8: "LF", svc: "LF", weekends: "wknd", holidays: "hol", sandbags: "bags", clampsInstalled: "clamps", clampsRental: "clamps", braces: "braces", braceSetup: "braces", braceTakedown: "braces", gates: "gates", flexbases: "bases" };
+  function buildRows() {
+    Object.keys(ROWS).forEach(function (cid) {
+      var html = ROWS[cid].map(function (r) {
+        var id = "f_" + r[1];
+        return '<div class="line" data-line="' + r[1] + '">' +
+          '<div class="what"><div class="name" id="' + id + '_name"></div><div class="rate" id="' + id + '_rate"></div></div>' +
+          '<div class="qty"><input class="inp num" id="' + id + '" data-k="' + r[0] + '" data-num="1" type="number" min="0" step="1" inputmode="numeric" aria-labelledby="' + id + '_name"><span class="unit">' + UNITS[r[1]] + '</span></div>' +
+          '<div class="amt" id="' + id + '_amt">$0.00</div>' +
+          '<div class="calc" id="' + id + '_calc" hidden></div></div>';
+      }).join("");
+      $(cid).innerHTML = html;
+    });
+  }
+
+  // ---------- fill inputs from state ----------
+  function fillInputs() {
+    document.querySelectorAll("[data-k]").forEach(function (el) {
+      var v = get(Q, el.getAttribute("data-k"));
+      if (el.getAttribute("data-num")) el.value = v ? v : (el.id === "q_periods" ? 1 : "");
+      else el.value = v == null ? "" : v;
+    });
+    $("svc_setup").checked = Q.b.service !== "dropoff";
+    $("svc_drop").checked = Q.b.service === "dropoff";
+    $("b_lfAuto").checked = !!Q.b.lfAuto;
+  }
+
+  // ---------- render ----------
+  function lineByKey(calc, key) { return calc.A.concat(calc.B, calc.C).filter(function (l) { return l.key === key; })[0]; }
+  function render() {
+    var k = compute(Q);
+    // line rows
+    Object.keys(ROWS).forEach(function (cid) {
+      ROWS[cid].forEach(function (r) {
+        var key = r[1], id = "f_" + key, l = lineByKey(k, key);
+        $(id + "_name").textContent = l.name;
+        $(id + "_rate").textContent = l.rateText;
+        var a = $(id + "_amt"); a.textContent = money(l.amt); a.classList.toggle("zero", !l.amt);
+        var calc = $(id + "_calc");
+        if (l.periods && l.qty) { calc.hidden = false; calc.textContent = int(l.qty) + " " + l.unit + " × " + money(l.rate || (l.amt / l.qty / l.periods)) + " × " + l.periods + (l.periods === 1 ? " period" : " periods"); }
+        else calc.hidden = true;
+      });
+    });
+    // Part B LF follows Part A
+    var bIn = $("f_svc");
+    bIn.disabled = !!Q.b.lfAuto;
+    if (Q.b.lfAuto) bIn.value = k.totalLF || "";
+    var svcCalc = $("f_svc_calc");
+    if (k.B[0].minApplied) { svcCalc.hidden = false; svcCalc.innerHTML = '<span class="pill pill-red">Minimum applied</span> ' + esc(int(k.bLF) + " LF × " + money(Q.b.service === "dropoff" ? R.dropoff : R.setup) + " = " + money(k.B[0].raw) + ", rounded up to $500.00"); }
+    else svcCalc.hidden = true;
+    // Sandbags
+    var sb = $("f_sandbags");
+    sb.placeholder = k.sandReq ? String(k.sandReq) : "0";
+    if (document.activeElement !== sb) sb.value = Q.c.sandbags == null ? (k.sandReq || "") : (Q.c.sandbags || "");
+    var sbc = $("f_sandbags_calc");
+    if (k.sandReq && k.sandEntered < k.sandReq) { sbc.hidden = false; sbc.innerHTML = '<span class="pill pill-red">Raised to ' + k.sandReq + '</span> When we set up screening, every screened panel needs a sandbag.'; }
+    else if (k.sandReq) { sbc.hidden = false; sbc.textContent = int(k.sLF) + " LF of screen = " + k.screenPanels + " panels, so at least " + k.sandReq + " sandbags."; }
+    else sbc.hidden = true;
+    // Screen rows
+    var scr = lineByKey(k, "screen");
+    $("linesScreen").querySelectorAll(".line.screen-line").forEach(function (n) { n.remove(); });
+    if (scr) {
+      var div = document.createElement("div");
+      div.className = "line screen-line";
+      div.innerHTML = '<div class="what"><div class="name"></div><div class="rate"></div></div><div class="qty"><span class="unit num"></span></div><div class="amt"></div>';
+      div.querySelector(".name").textContent = scr.name;
+      div.querySelector(".rate").textContent = scr.rateText;
+      div.querySelector(".unit").textContent = int(scr.qty) + " " + scr.unit;
+      div.querySelector(".amt").textContent = money(scr.amt);
+      $("linesScreen").insertBefore(div, $("linesScreen").firstChild);
+    }
+    var none = Q.c.screenHeight === "none";
+    $("s_mode").disabled = none; $("s_lf").disabled = none;
+    $("s_lfHint").textContent = none ? "Choose a screen to add it" : (Q.c.screenMode === "supply" ? "Sold in 150' rolls, rounded up" : "Installed on " + k.screenPanels + " panels");
+    // Part A note
+    $("panelNote").innerHTML = k.totalLF ? "<b>" + esc(int(k.totalLF)) + " linear ft</b> of fence = <b>" + esc(int(k.panels)) + " panels</b> (10' each) for " + k.periods + " × 4-week " + (k.periods === 1 ? "period" : "periods") + "." : "Enter linear feet for each fence height you need.";
+    // valid hint
+    $("validHint").textContent = Q.validAuto ? "30 days from the quote date" : "Set by you";
+    // subtotals
+    $("subA").textContent = money(k.subA); $("subB").textContent = money(k.subB); $("subC").textContent = money(k.subC);
+    $("sumA").textContent = money(k.subA); $("sumB").textContent = money(k.subB); $("sumC").textContent = money(k.subC);
+    $("sumTotal").textContent = money(k.total);
+    $("sumPanels").textContent = int(k.panels); $("sumLF").textContent = int(k.totalLF);
+    // header
+    $("sumNo").textContent = Q.number || "Not saved yet";
+    $("sumState").textContent = !Q.number ? "Draft" : (dirty ? "Unsaved changes" : "Saved " + (Q.updatedAt ? new Date(Q.updatedAt).toLocaleDateString("en-CA", { month: "short", day: "numeric" }) : ""));
+    // warnings
+    var w = [];
+    if (!repReady()) w.push("Add your contact info so it shows on the quote.");
+    if (!Q.customer.name && !Q.customer.company) w.push("Add the customer name or company.");
+    if (!k.totalLF) w.push("Enter the fence footage in Part A.");
+    $("warnings").innerHTML = w.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("");
+    // banners
+    $("repBanner").hidden = repReady();
+    $("exampleBanner").hidden = !isEmpty();
+    updateEmailLink(k);
+    return k;
+  }
+  function isEmpty() { var b = blankQuote(); return !Q.number && JSON.stringify([Q.customer, Q.a, Q.c, Q.b.weekends, Q.b.holidays, Q.notes, Q.deliveryDate]) === JSON.stringify([b.customer, b.a, b.c, 0, 0, "", ""]); }
+  function repReady() { return !!(rep && rep.name && (rep.email || rep.phone || rep.mobile)); }
+
+  // ---------- input binding ----------
+  function persistDraft() { store(KEY.draft, { q: Q, dirty: dirty }); }
+  function changed() { dirty = true; persistDraft(); render(); }
+  document.addEventListener("input", function (e) {
+    var el = e.target; var k = el.getAttribute && el.getAttribute("data-k"); if (!k) return;
+    var v = el.value;
+    if (el.getAttribute("data-num")) {
+      if (k === "c.sandbags") v = v === "" ? null : Math.max(0, Math.round(n0(v)));
+      else v = n0(v);
+      if (k === "periods") v = Math.max(1, Math.round(v) || 1);
+    }
+    set(Q, k, v);
+    if (k === "quoteDate" && Q.validAuto && v) { Q.validUntil = addDays(v, 30); $("q_valid").value = Q.validUntil; }
+    if (k === "validUntil") Q.validAuto = false;
+    changed();
+  });
+  document.addEventListener("change", function (e) {
+    var el = e.target;
+    if (el.name === "svc") { Q.b.service = el.value; changed(); }
+    if (el.id === "b_lfAuto") { Q.b.lfAuto = el.checked; if (!el.checked) { Q.b.lf = compute(Q).totalLF; $("f_svc").value = Q.b.lf || ""; } changed(); }
+    if (el.id === "s_height" || el.id === "s_mode") { if (Q.c.sandbags != null && compute(Q).sandReq === 0) {} changed(); }
+    if (el.id === "f_sandbags") { render(); }
+    if (el.id === "q_periods" && !el.value) { el.value = 1; }
+  });
+
+  // ---------- rep ----------
+  function initials(n) { return (n || "").split(/\s+/).filter(Boolean).slice(0, 2).map(function (s) { return s[0].toUpperCase(); }).join("") || "?"; }
+  function renderRep() {
+    if (repReady()) {
+      $("repAvatar").textContent = initials(rep.name);
+      $("repChipName").textContent = rep.name;
+      $("repChipSub").textContent = [rep.title, rep.branch].filter(Boolean).join(" · ") || "Edit contact info";
+    } else {
+      $("repAvatar").textContent = "?";
+      $("repChipName").textContent = "Add your contact info";
+      $("repChipSub").textContent = "Saved in this browser";
+    }
+  }
+  function openRep() {
+    var r = rep || {};
+    $("r_name").value = r.name || ""; $("r_title").value = r.title || ""; $("r_branch").value = r.branch || "";
+    $("r_email").value = r.email || ""; $("r_phone").value = r.phone || ""; $("r_mobile").value = r.mobile || "";
+    $("repDlg").showModal();
+  }
+  $("repChip").addEventListener("click", openRep);
+  $("repBannerBtn").addEventListener("click", openRep);
+  $("repDlg").addEventListener("close", function () {
+    if ($("repDlg").returnValue !== "save") return;
+    rep = { name: $("r_name").value.trim(), title: $("r_title").value.trim(), branch: $("r_branch").value.trim(), email: $("r_email").value.trim(), phone: $("r_phone").value.trim(), mobile: $("r_mobile").value.trim() };
+    var ok = store(KEY.rep, rep);
+    renderRep(); render();
+    toast(ok ? "Your contact info is saved in this browser" : "Contact info updated for this session (this browser blocks saving)");
+  });
+
+  // ---------- quote numbers & saving ----------
+  function nextNumber() {
+    var n = (parseInt(load(KEY.counter, 0), 10) || 0) + 1;
+    // Never reuse a number already in the saved list
+    var d = new Date(), yymm = String(d.getFullYear()).slice(2) + ("0" + (d.getMonth() + 1)).slice(-2);
+    var ini = rep && rep.name ? initials(rep.name) : "BR";
+    var num;
+    do { num = "FQ-" + ini + "-" + yymm + "-" + ("000" + n).slice(-4); n++; } while (quotes.some(function (x) { return x.number === num; }));
+    store(KEY.counter, n - 1);
+    return num;
+  }
+  function saveQuote(silent) {
+    var now = new Date().toISOString();
+    if (!Q.number) { Q.number = nextNumber(); Q.createdAt = now; }
+    Q.updatedAt = now;
+    var k = compute(Q);
+    var rec = clone(Q); rec.total = k.total;
+    var i = quotes.findIndex(function (x) { return x.id === Q.id; });
+    if (i >= 0) quotes[i] = rec; else quotes.unshift(rec);
+    var ok = store(KEY.quotes, quotes);
+    dirty = false; persistDraft(); render(); renderSavedCount();
+    if (!silent) toast(ok ? "Quote " + Q.number + " saved" : "Quote " + Q.number + " kept for this session only (this browser blocks saving)");
+    return ok;
+  }
+  $("saveBtn").addEventListener("click", function () { saveQuote(false); });
+  function renderSavedCount() { $("savedCount").textContent = quotes.length ? "(" + quotes.length + ")" : ""; }
+
+  // ---------- new / example ----------
+  var newArmed = false;
+  $("newQuote").addEventListener("click", function () {
+    if (dirty && !isEmpty() && !newArmed) {
+      newArmed = true; $("newQuote").textContent = "Discard changes?";
+      setTimeout(function () { newArmed = false; $("newQuote").textContent = "New quote"; }, 4000);
+      setStatus("This quote has unsaved changes. Click again to start a new one anyway, or save it first.");
+      return;
+    }
+    newArmed = false; $("newQuote").textContent = "New quote";
+    Q = blankQuote(); dirty = false; persistDraft(); fillInputs(); render(); hideEmailBox(); setStatus("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+  $("loadExample").addEventListener("click", function () { Q = exampleQuote(); dirty = true; persistDraft(); fillInputs(); render(); toast("Example loaded. Change any field to see the totals update."); });
+
+  // ---------- saved quotes dialog ----------
+  var delArmed = null;
+  function renderSaved() {
+    var q = $("savedSearch").value.trim().toLowerCase();
+    var list = quotes.slice().sort(function (a, b) { return (b.updatedAt || "").localeCompare(a.updatedAt || ""); })
+      .filter(function (x) { return !q || [x.number, x.customer.name, x.customer.company, x.customer.site].join(" ").toLowerCase().indexOf(q) >= 0; });
+    $("savedDirty").hidden = !(dirty && !isEmpty());
+    if (!quotes.length) { $("savedList").innerHTML = '<div class="empty"><b>No saved quotes yet</b>Quotes you save appear here, in this browser, so you can reopen, copy or update them.</div>'; return; }
+    if (!list.length) { $("savedList").innerHTML = '<div class="empty"><b>No matches</b>Try a quote number, customer or company.</div>'; return; }
+    $("savedList").innerHTML = list.map(function (x) {
+      var who = x.customer.company || x.customer.name || "No customer name";
+      var meta = [x.number, x.customer.company && x.customer.name ? x.customer.name : "", x.customer.site, "Updated " + (x.updatedAt ? new Date(x.updatedAt).toLocaleDateString("en-CA", { year: "numeric", month: "short", day: "numeric" }) : "")].filter(Boolean).join(" · ");
+      return '<div class="saved-item"><div class="who"><b>' + esc(who) + '</b> <span class="tot">' + esc(money(x.total || 0)) + '</span><div class="meta">' + esc(meta) + '</div></div>' +
+        '<div class="acts"><button class="btn btn-black btn-sm" data-open="' + esc(x.id) + '">Open</button>' +
+        '<button class="btn btn-outline btn-sm" data-dup="' + esc(x.id) + '">Copy as new</button>' +
+        '<button class="btn btn-ghost btn-sm" data-del="' + esc(x.id) + '">' + (delArmed === x.id ? "Confirm delete" : "Delete") + '</button></div></div>';
+    }).join("");
+  }
+  $("openSaved").addEventListener("click", function () { delArmed = null; $("savedSearch").value = ""; renderSaved(); $("savedDlg").showModal(); });
+  $("closeSaved").addEventListener("click", function () { $("savedDlg").close(); });
+  $("savedSearch").addEventListener("input", renderSaved);
+  $("savedList").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    var id = b.getAttribute("data-open") || b.getAttribute("data-dup") || b.getAttribute("data-del");
+    var rec = quotes.filter(function (x) { return x.id === id; })[0]; if (!rec) return;
+    if (b.hasAttribute("data-open")) {
+      Q = clone(rec); delete Q.total; dirty = false; persistDraft(); fillInputs(); render(); hideEmailBox();
+      $("savedDlg").close(); toast("Opened " + rec.number);
+    } else if (b.hasAttribute("data-dup")) {
+      Q = clone(rec); delete Q.total; Q.id = uid(); Q.number = ""; Q.createdAt = null; Q.updatedAt = null;
+      Q.quoteDate = today(); Q.validUntil = addDays(Q.quoteDate, 30); Q.validAuto = true;
+      dirty = true; persistDraft(); fillInputs(); render(); hideEmailBox();
+      $("savedDlg").close(); toast("Copied " + rec.number + " into a new quote. Save it to give it a number.");
+    } else if (b.hasAttribute("data-del")) {
+      if (delArmed !== id) { delArmed = id; renderSaved(); return; }
+      quotes = quotes.filter(function (x) { return x.id !== id; }); store(KEY.quotes, quotes);
+      if (Q.id === id) { Q.number = ""; dirty = true; persistDraft(); render(); }
+      delArmed = null; renderSaved(); renderSavedCount(); toast("Deleted " + rec.number);
+    }
+  });
+
+  // ---------- quote document ----------
+  var TERMS = [
+    "This agreement will commence on the day equipment is delivered to the customer's premises and terminate upon removal of equipment from the premises in good condition.",
+    "The customer agrees not to cause equipment to be removed from the job location without specific written consent from Battlefield Equipment Rentals.",
+    "The customer agrees to exercise care in the use and handling of equipment and will be responsible for any damages to equipment. The customer is responsible for the replacement cost of the equipment if complete loss occurs, including fire and theft. Replacement cost of a standard fence panel is $250.00, top clip $24.00 and base $45.00.",
+    "The customer assumes all risk and liability for injury to any person or damage to any property arising from the use, condition, possession or storage of the rental equipment. The customer will indemnify, defend and hold harmless Battlefield Equipment Rentals, its agents and employees for all claims, losses or damages relating to the use of equipment.",
+    "The customer agrees to maintain personal injury, property damage and general liability insurance insuring the interest of Battlefield Equipment Rentals, the Lessee, and their authorized agents and employees. The policy will be for primary coverage and will have limits acceptable to Battlefield Equipment Rentals. Upon request by Battlefield Equipment Rentals, the Lessee shall deliver a certificate evidencing such insurance coverage.",
+    "Battlefield Equipment Rentals hereby accepts the customer's order for the equipment and services, but such acceptance is expressly conditional upon acceptance of the conditions set forth herein. In the event the agreement is not signed, payment against any invoices shall constitute agreement to these terms.",
+    "This quotation is not an invoice. All applicable taxes are extra. All prices are net; no further discounts apply."
+  ];
+  function docRows(lines, title, note, sub) {
+    var used = lines.filter(function (l) { return l.amt > 0 || l.qty > 0; });
+    var h = '<tr class="part"><td colspan="4">' + esc(title) + '</td></tr>';
+    if (note) h += '<tr class="part-note"><td colspan="4">' + esc(note) + '</td></tr>';
+    if (!used.length) h += '<tr class="none"><td colspan="4">Not included</td></tr>';
+    used.forEach(function (l) {
+      var qty = int(l.qty) + " " + (l.unit || "") + (l.periods ? " × " + l.periods + (l.periods === 1 ? " period" : " periods") : "");
+      h += '<tr class="avoid"><td>' + esc(l.name) + '<div class="d">' + esc(l.rateText) + '</div></td><td class="r">' + esc(qty) + '</td><td class="r">' + esc(money(l.amt)) + '</td></tr>';
+    });
+    h += '<tr class="sub"><td colspan="2" class="r">' + esc(title.split(":")[0]) + ' total</td><td class="r">' + esc(money(sub)) + '</td></tr>';
+    return h.replace(/colspan="4"/g, 'colspan="3"');
+  }
+  function buildDoc() {
+    var k = compute(Q), r = rep || {}, c = Q.customer;
+    var repLines = [r.title, r.branch ? r.branch + " branch" : ""].filter(Boolean).join(", ");
+    var contact = [r.phone ? "Office " + r.phone : "", r.mobile ? "Mobile " + r.mobile : ""].filter(Boolean).join(" · ");
+    var custLines = [c.company && c.name ? c.company : "", c.site, c.phone ? "Phone " + c.phone : "", c.fax ? "Fax " + c.fax : "", c.email].filter(Boolean);
+    var h = '<div class="qd"><div class="qd-sheet">' +
+      '<div class="qd-top"><img class="qd-logo" src="' + LOGO_PNG + '" alt="Battlefield Equipment Rentals"><div class="qd-title"><h1>Temporary Fencing<br>Rental Quotation</h1>' +
+      '<div>Quote <b>' + esc(Q.number || "DRAFT") + '</b> · ' + esc(longDate(Q.quoteDate)) + '</div></div></div>' +
+      '<div class="qd-parties"><div class="qd-party"><div class="qd-k">Prepared for</div><div class="nm">' + esc(c.name || c.company || "Customer") + '</div>' +
+      custLines.map(function (x) { return "<div>" + esc(x) + "</div>"; }).join("") + '</div>' +
+      '<div class="qd-party"><div class="qd-k">Your Battlefield contact</div><div class="nm">' + esc(r.name || "Battlefield Equipment Rentals") + '</div>' +
+      (repLines ? "<div>" + esc(repLines) + "</div>" : "") + (contact ? "<div>" + esc(contact) + "</div>" : "") + (r.email ? "<div>" + esc(r.email) + "</div>" : "") + '<div>BattlefieldEquipment.ca</div></div></div>' +
+      '<div class="qd-facts"><div>Jobsite<b>' + esc(c.site || "To be confirmed") + '</b></div><div>Est. delivery<b>' + esc(Q.deliveryDate ? longDate(Q.deliveryDate) : "To be confirmed") + '</b></div><div>Rental term<b>' + esc(k.periods + " × 4 weeks") + '</b></div><div>Fence<b>' + esc(int(k.totalLF) + " LF · " + int(k.panels) + " panels") + '</b></div></div>' +
+      '<table><thead><tr><th>Item</th><th class="r">Quantity</th><th class="r">Amount</th></tr></thead><tbody>' +
+      docRows(k.A, "Part A: Monthly fence rental charge", "Temporary fencing comes with all bases, clips, gates and castors necessary, as per customer request.", k.subA) +
+      docRows(k.B, "Part B: Set up & take down / drop off & pick up", "The set up & take down or drop off & pick up charge rounds up to $500 when under $500. Additional trips to your site are subject to a minimum mobilization fee of $250 (one-way).", k.subB) +
+      docRows(k.C, "Part C: Add-ons (sale & rent)", k.sandReq ? "When Battlefield sets up privacy screening, a sandbag must be purchased for every screened panel." : "", k.subC) +
+      '</tbody></table>' +
+      '<div class="qd-totals avoid"><div class="qd-notes"><p><b>Rates per 4-week period</b> apply to fence, clamp, brace and flexbase rentals.</p><p>Replacement cost if lost or damaged beyond repair: fence panel $250.00, top clip $24.00, base $45.00.</p></div>' +
+      '<div class="qd-box"><div class="r"><span>Total Part A</span><b>' + esc(money(k.subA)) + '</b></div><div class="r"><span>Total Part B</span><b>' + esc(money(k.subB)) + '</b></div><div class="r"><span>Total Part C</span><b>' + esc(money(k.subC)) + '</b></div>' +
+      '<div class="grand"><span>Total estimated cost*</span><span>' + esc(money(k.total)) + '</span></div><div class="panels"><span>Total fence panels</span><b>' + esc(int(k.panels)) + '</b></div></div></div>' +
+      '<div class="qd-disc avoid">*THIS IS NOT AN INVOICE · ALL APPLICABLE TAXES ARE EXTRA · ALL PRICES ARE NET · NO FURTHER DISCOUNTS</div>' +
+      '<div class="qd-valid">This quotation is valid until <b>' + esc(longDate(Q.validUntil) || "30 days from the quote date") + '</b>.</div>' +
+      (Q.notes ? '<div class="qd-cnotes avoid"><b>Notes</b>\n' + esc(Q.notes) + '</div>' : "") +
+      '<div class="qd-terms pb"><h2>Fence rental agreement: terms and conditions</h2><ol>' + TERMS.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + '</ol>' +
+      '<div class="qd-sign avoid"><div>Customer signature</div><div>Customer name</div><div>Date</div></div></div>' +
+      '<div class="qd-foot avoid"><span><b>Battlefield Equipment Rentals</b> · a Cat Rentals dealer · BattlefieldEquipment.ca</span><span>' + esc([r.name, r.mobile || r.phone, r.email].filter(Boolean).join(" · ")) + '</span></div>' +
+      '</div></div>';
+    return h;
+  }
+
+  // ---------- preview ----------
+  function openPreview() { $("previewBody").innerHTML = buildDoc(); $("previewDlg").showModal(); }
+  $("previewBtn").addEventListener("click", openPreview);
+  $("closePreview").addEventListener("click", function () { $("previewDlg").close(); });
+  $("closePreview2").addEventListener("click", function () { $("previewDlg").close(); });
+
+  // ---------- PDF ----------
+  var downloads = null;
+  if (window.claude && typeof window.claude.use === "function") {
+    window.claude.use("downloads").then(function (d) { downloads = d; }).catch(function () { downloads = null; });
+  }
+  function fileName() { return ("Battlefield Fence Quote " + (Q.number || "Draft") + (Q.customer.company || Q.customer.name ? " - " + (Q.customer.company || Q.customer.name) : "")).replace(/[\\/:*?"<>|]+/g, " ").replace(/\s+/g, " ").trim() + ".pdf"; }
+  var busy = false;
+  function makePdf() {
+    if (busy) return;
+    if (typeof window.html2pdf !== "function") { setStatus("The PDF tool didn't load. Check your connection and reload the page."); return; }
+    if (!Q.number || dirty) saveQuote(true);
+    busy = true; setPdfBusy(true); setStatus("Building the PDF...");
+    var el = buildDoc();
+    var opt = { margin: [0.45, 0.45, 0.5, 0.45], filename: fileName(), image: { type: "jpeg", quality: 0.96 },
+      html2canvas: { scale: 2, useCORS: true, backgroundColor: "#FFFFFF", logging: false, scrollX: 0, scrollY: 0 },
+      jsPDF: { unit: "in", format: "letter", orientation: "portrait" }, pagebreak: { mode: ["css", "legacy"], avoid: [".avoid", "tr"] } };
+    var ready = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+    ready.then(function () {
+      if (downloads) {
+        return window.html2pdf().set(opt).from(el).outputPdf("blob").then(function (blob) {
+          return downloads.save({ filename: opt.filename, data: blob }).then(function () { setStatus("PDF saved: " + opt.filename); },
+            function (err) {
+              var c = err && err.code;
+              if (c === "declined") setStatus("Download cancelled.");
+              else if (c === "rate_limited") setStatus("A download prompt is already open. Finish it, then try again.");
+              else setStatus("Downloads aren't available in this view. Open the quote builder in your browser to download.");
+            });
+        });
+      }
+      return window.html2pdf().set(opt).from(el).save().then(function () { setStatus("PDF saved: " + opt.filename); });
+    }).catch(function () { setStatus("Something went wrong building the PDF. Try again."); })
+      .then(function () { busy = false; setPdfBusy(false); });
+  }
+  function setPdfBusy(b) { ["pdfBtn", "pdfBtn2"].forEach(function (id) { $(id).disabled = b; $(id).textContent = b ? "Building PDF..." : "Download PDF"; }); }
+  $("pdfBtn").addEventListener("click", makePdf);
+  $("pdfBtn2").addEventListener("click", makePdf);
+
+  // ---------- email ----------
+  function emailParts(k) {
+    var r = rep || {}, c = Q.customer;
+    var subject = "Temporary fence rental quote " + (Q.number || "") + (c.company ? " - " + c.company : (c.site ? " - " + c.site : ""));
+    var first = (c.name || "").split(/\s+/)[0];
+    var body = [
+      "Hi" + (first ? " " + first : "") + ",",
+      "",
+      "Thanks for the opportunity to quote your temporary fencing" + (c.site ? " at " + c.site : "") + ". Your quote " + (Q.number || "") + " is attached.",
+      "",
+      "Total estimated cost: " + money(k.total) + " (taxes extra)",
+      "Fence: " + int(k.totalLF) + " linear ft (" + int(k.panels) + " panels) for " + k.periods + " x 4-week " + (k.periods === 1 ? "period" : "periods"),
+      Q.deliveryDate ? "Estimated delivery: " + longDate(Q.deliveryDate) : "",
+      "This quote is valid until " + (longDate(Q.validUntil) || "30 days from today") + ".",
+      "",
+      "Let me know if you have any questions or you're ready to book.",
+      "",
+      r.name || "",
+      [r.title, "Battlefield Equipment Rentals"].filter(Boolean).join(", "),
+      r.branch || "",
+      [r.phone ? "Office " + r.phone : "", r.mobile ? "Mobile " + r.mobile : ""].filter(Boolean).join(" | "),
+      r.email || "",
+      "BattlefieldEquipment.ca"
+    ].filter(function (l, i, a) { return !(l === "" && i > 9 && a[i - 1] === ""); }).join("\n").replace(/\n{3,}/g, "\n\n");
+    return { to: c.email || "", subject: subject, body: body };
+  }
+  function updateEmailLink(k) {
+    var p = emailParts(k);
+    $("emailBtn").href = "mailto:" + encodeURIComponent(p.to).replace(/%40/g, "@") + "?subject=" + encodeURIComponent(p.subject) + "&body=" + encodeURIComponent(p.body);
+    $("emailTo").textContent = p.to ? "To: " + p.to : "No customer email entered yet.";
+  }
+  function hideEmailBox() { $("emailBox").hidden = true; }
+  $("emailBtn").addEventListener("click", function () {
+    if (!Q.number || dirty) saveQuote(true);
+    updateEmailLink(compute(Q));
+    $("emailBox").hidden = false;
+    setStatus("Opening your email app. Attach the PDF before sending.");
+  });
+  function copy(text, label) {
+    function fallback() { var ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); var ok = false; try { ok = document.execCommand("copy"); } catch (e) {} ta.remove(); toast(ok ? label + " copied" : "Copy didn't work here. Select the text in the preview instead."); }
+    try { navigator.clipboard.writeText(text).then(function () { toast(label + " copied"); }, fallback); } catch (e) { fallback(); }
+  }
+  $("copySubject").addEventListener("click", function () { copy(emailParts(compute(Q)).subject, "Subject"); });
+  $("copyBody").addEventListener("click", function () { copy(emailParts(compute(Q)).body, "Message"); });
+  $("copyTo").addEventListener("click", function () { var t = Q.customer.email; if (!t) { toast("Add the customer's email first"); return; } copy(t, "Address"); });
+
+  // ---------- feedback ----------
+  var tt;
+  function toast(msg) { var t = $("toast"); t.textContent = msg; t.hidden = false; clearTimeout(tt); tt = setTimeout(function () { t.hidden = true; }, 3200); }
+  function setStatus(msg) { $("status").textContent = msg; }
+
+  // ---------- boot ----------
+  buildRows(); fillInputs(); renderRep(); renderSavedCount(); render();
+})();
+</script>
+
+</body>
+</html>
