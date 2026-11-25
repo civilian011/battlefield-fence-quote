@@ -2,7 +2,7 @@
 
 A single-page app for Battlefield Equipment Rentals sales reps to build temporary fence rental quotations and send them to customers as PDFs.
 
-Open the live app on GitHub Pages, or download `index.html` and open it in Edge or Chrome. No install needed.
+Open the live app at https://davidwhite.app/battlefield-fence-quote/ (sign in with your toromont.com email), or download `index.html` and open it in Edge or Chrome. No install needed.
 
 - **Your contact info**: enter it once; it is saved in your browser and printed on every quote and email.
 - **Customer & jobsite**: who the quote is for, dates and the rental term (number of 4-week periods).
